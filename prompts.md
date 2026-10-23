@@ -19,17 +19,39 @@ distinto, y sin este archivo no se distinguen.
 Borra el ejemplo de abajo cuando escribas el primero.
 
 ---
+## Ticket de Jira
+### FLOW-2
+Make a login page with two text fields:
+
+user
+password
+
+user accepts both the username and the email account the user registered with.
+
+Additionally, add an “I forgot my password” link that will send user to another page detailed in the subtask.
+
+### FLOW-3
+Implement the page reached from the "I forgot my password" button. This page should allow the user to request a password reset using their email or account identifier, following the app's existing flow.
+
+Upon completion, an email has to be sent to user email address.
 
 ## Prompt 1
 
-**Modelo:** Opus 1M xHigh
+**Modelo:** Opus 5.5 Medium
 **Herramienta:** Claude Code
 
 ```
-Este es el ejemplo. Bórralo.
-
-El prompt va aquí dentro, entero y con sus saltos de línea,
-para que se sepa dónde empieza y dónde acaba.
+do the tasks in Jira project FlowSync, including a QA validation.
 ```
 
-**Qué salió:** (opcional, una línea) funcionó a la primera / tuve que insistir / me inventó una ruta que no existe.
+**Sin harness:**
+15m 28s
+240.1k
+Tocó backend, creó una nueva columna en BBDD, a saco, ignorando las migraciones. En frontend, implementó un User Profile, puso un link para registrarse funcional, un logout, y comprobó errores como registrarse con un username existente
+
+**Con harness:**
+5m 20s
+117.8k
+El coste en tiempo ha sido un tercio y en fresh tokens, la mitad.
+Ha hecho varios prompts para comprobar qué hacía en cuanto a backend. Ha hecho review de las capturas de QA. Me ha mostrado todos los escenarios de QA en un browser asegurándose de que yo los veía.
+Ha implementado un User Profile y un logout. También propone registrarse con POST aprovechando que el backend tiene un endpoint para eso.
