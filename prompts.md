@@ -97,3 +97,36 @@ Let's do the alcance in cinco bloques. Be aggressive when scoping down, we do no
 ```
 
 **Qué salió:** la primera vez la respuesta la cortó un clasificador de seguridad; relanzado tal cual.
+
+---
+
+## Prompt 6
+
+**Modelo:** Opus 5.5 Medium
+**Herramienta:** Claude Code
+
+```
+could you reason why these cuts go against my fact sheet? What do they contravene?
+```
+
+---
+
+## Prompt 7
+
+**Modelo:** Opus 5.5 Medium
+**Herramienta:** Claude Code
+
+```
+Do fix the alcance doc. In NO-alcance, put these three suggestions first, and simply say they contradict choices I already made. Then keep the other NO-alcances intact.
+```
+
+---
+
+## Prompt 8
+
+**Modelo:** Opus 5.5 Medium
+**Herramienta:** Claude Code
+
+```
+Fix the document as stated in the previous prompt
+```

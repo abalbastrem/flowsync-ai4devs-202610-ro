@@ -59,12 +59,13 @@ Una lista compartida que es a la vez tu cola de trabajo y el estado del equipo: 
 
 ### NO-alcance
 
-Cada exclusión, con la hipótesis que no ayuda a validar:
+En una primera propuesta, Claude ha propuesto las siguientes tres exclusiones que contradecían la documentación:
+- **Fecha de vencimiento y aviso de vencidas.** Contradice una decisión ya tomada en la ficha de hechos.
+- **Editar y borrar tareas.** Contradice una decisión ya tomada en la ficha de hechos.
+- **Asignar una tarea a otra persona.** Contradice una decisión ya tomada en la ficha de hechos.
 
-- **Fecha de vencimiento y aviso de vencidas.** La ficha la pedía, pero la hipótesis es "quién está en qué", no "qué va tarde". Es otro campo y otra regla que no hacen falta para cancelar la ronda.
-- **Asignar una tarea a otra persona.** Repartir trabajo es cosa de un lead, y aquí no lo hay. Si te la coges tú, el estado lo escribe quien hace el trabajo.
+Las siguientes exclusiones deberían ser menos problemáticas.
 - **Bloquear una tarea para que nadie más la coja.** Para validar basta con ver que ya está cogida. Bloquearla impone una regla antes de saber si hace falta.
-- **Editar y borrar tareas.** Lo que se quiere validar es el ciclo coger-estado. Una tarea mal escrita se cierra y se crea otra.
 - **Descripción, comentarios y adjuntos.** Convierten la lista en un sitio donde se conversa, y la hipótesis es de estado, no de discusión.
 - **Resumen de "qué ha cambiado desde tu última visita".** La lista ya muestra el estado actual. Un histórico de cambios es otra capability.
 - **Notificaciones push e integración con Slack.** Interrumpen, y la señal tiene que ser un resumen que espera.
@@ -83,7 +84,7 @@ Cada exclusión, con la hipótesis que no ayuda a validar:
 
 1. **Los dos números:**
 Claude propuso 6 cosas, yo recorté a 5.
-Claude propuso 15 items en NO-alcance, y no creo que sean malas propuestas.
+Claude propuso 15 items en NO-alcance, y he recortado a 12.
 
 2. **Tres cosas que dejé fuera, y por qué:**
 Filtrar la lista por estado. Es un Nice to have en este punto. Un programador solo tiene que tomar una tarea de la primera columna y hacer click.
