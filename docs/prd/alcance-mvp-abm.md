@@ -59,10 +59,10 @@ Una lista compartida que es a la vez tu cola de trabajo y el estado del equipo: 
 
 ### NO-alcance
 
-En una primera propuesta, Claude ha propuesto las siguientes tres exclusiones que contradecían la documentación:
-- **Fecha de vencimiento y aviso de vencidas.** Contradice una decisión ya tomada en la ficha de hechos.
-- **Editar y borrar tareas.** Contradice una decisión ya tomada en la ficha de hechos.
-- **Asignar una tarea a otra persona.** Contradice una decisión ya tomada en la ficha de hechos.
+En una primera propuesta, Claude ha propuesto las siguientes tres exclusiones que contradecían la ficha de hechos. Por tanto, esto no son exclusiones actuales, pero me parece interesante documentarlas.
+- **Fecha de vencimiento y aviso de vencidas.**
+- **Editar y borrar tareas.**
+- **Asignar una tarea a otra persona.**
 
 Las siguientes exclusiones deberían ser menos problemáticas.
 - **Bloquear una tarea para que nadie más la coja.** Para validar basta con ver que ya está cogida. Bloquearla impone una regla antes de saber si hace falta.
@@ -90,4 +90,5 @@ Claude propuso 15 items en NO-alcance, y he recortado a 12.
 Filtrar la lista por estado. Es un Nice to have en este punto. Un programador solo tiene que tomar una tarea de la primera columna y hacer click.
 
 3. **La exclusión de la que menos seguro estoy:**
-Bloquear una tarea para que nadie más la coja. Realmente no es tan controvertida, pero contraviene todos mis instintos por si hay bad players en el equipo de devs.
+Bloquear una tarea para que nadie más la coja. Se contradicen dos cosas: lo barato y suficiente para validar (ver que la tarea ya está cogida debería bastar) contra mi desconfianza de que todo el equipo lo respete (bad players en el equipo de devs).
+Entraría si, en la semana de prueba, aparece aunque sea un caso de dos personas en curso sobre la misma tarea a pesar de verla cogida: significaría que la visibilidad no basta y hace falta una regla.
