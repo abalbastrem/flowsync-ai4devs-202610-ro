@@ -16,7 +16,7 @@ Los miembros de un equipo remoto de 3–10 personas, con roles planos: todos ven
 
 ## 3. Objetivo y métrica de éxito
 
-**Hipótesis.** Si ver quién está en qué y qué se ha movido cuesta cero, y actualizarlo cuesta dos clics sobre la lista que ya tienes abierta, el equipo deja de necesitar la ronda de "¿en qué estás?".
+**Hipótesis.** Si ver quién está en qué y qué se ha movido cuesta cero, y actualizarlo cuesta como mucho dos clics sobre la lista que ya tienes abierta, el equipo deja de necesitar la ronda de "¿en qué estás?".
 
 **Criterio de éxito, a una semana de uso real:** el equipo cancela esa ronda de la daily y nadie pide que vuelva. Si la siguen haciendo igual, no funcionó.
 
@@ -32,7 +32,7 @@ Una vertical fina y usable de punta a punta. FlowSync **sustituye** al gestor de
 4. **Cambiar el estado** entre tres estados fijos: pendiente, en curso y hecha.
 5. **Editar** el título y la fecha de vencimiento, y **borrar** una tarea.
 6. **Ver de un vistazo qué se ha pasado de plazo.**
-7. **Filtrar la lista por estado**, eligiendo entre valores predefinidos.
+7. **Filtrar la lista por estado.**
 8. **Ver los cambios de los demás sin refrescar.**
 9. **Un resumen de lo que ha cambiado desde tu última visita**, arriba y separado de la lista: el "llego por la mañana y veo qué se ha movido".
 
@@ -43,14 +43,14 @@ Una vertical fina y usable de punta a punta. FlowSync **sustituye** al gestor de
 | Asignar una tarea a otra persona | La hipótesis es "cojo yo lo que está libre". Asignar a otros es un patrón de lead, y aquí no hay lead. |
 | Bloquear una tarea para que nadie más la coja | Para validar basta con ver que ya está cogida, y la confirmación al coger o cambiar de estado una tarea ajena (FR-4) evita los despistes. Bloquear impone una regla antes de saber si hace falta. |
 | Impedir que dos personas trabajen en lo mismo | El MVP no puede evitarlo: muestra quién tiene cada tarea, y quien trabaja en algo sin cogerlo, o en algo que ya tiene otro, lo hace saltándose la herramienta. |
-| Filtro "mis tareas" | No lo pide la ficha. Con 3–10 personas la lista se lee entera, y el responsable ya se ve en cada tarea. |
+| Filtro "mis tareas" | No lo piden los datos de partida. Con 3–10 personas la lista se lee entera, y el responsable ya se ve en cada tarea. |
 | Vista kanban por columnas | Las columnas no dan información que no dé el filtro por estado. La hipótesis es quién está en qué, no el flujo de trabajo. |
 | Descripción, comentarios y adjuntos | Convierten la lista en un sitio donde se conversa o se documenta, y la hipótesis es de estado, no de discusión ni de documentación. |
 | Notificaciones push e integración con Slack | Interrumpen, y la señal tiene que ser un resumen que espera (scope 9). |
 | Quién está conectado e indicadores de actividad | Es presencia de la persona, no frescura de la tarea: vigilancia, rechazada a propósito. |
 | Sprints, estimaciones, épicas, prioridad y orden manual | No dicen quién está en qué, y un equipo que los necesite no es nuestro usuario. |
 | Informes y analítica | No hay nadie arriba que los lea, y no validan nada para los pares. |
-| Vista de historial por tarea | El resumen de la última visita cubre "qué se ha movido". Los cambios se registran solo para alimentar ese resumen; consultar lo que pasó antes no ayuda a decidir qué coger hoy. |
+| Vista de historial por tarea | El resumen de la última visita cubre "qué se ha movido". Consultar lo que pasó antes no ayuda a decidir qué coger hoy. |
 | Varios equipos o espacios, invitaciones, roles y permisos | Con un espacio único y roles planos el caso de estudio ya se valida. El precio es el riesgo 3. |
 | Estados configurables | Configurar es justo el "rollo de Jira" que se quiere evitar. |
 | Integraciones con Git, CI o calendario, e importar del gestor anterior | Es otro producto, con OAuth de terceros. Además, el estado lo cambia a mano quien hace la tarea, con un par de clics, en vez de derivarse de señales externas. |
@@ -92,13 +92,13 @@ Los casos límite (concurrencia, primera visita, errores de red, longitudes máx
 
 ## 8. Supuestos y riesgos
 
-**Supuestos** (lo que la ficha no cubre y se ha decidido):
+**Supuestos** (lo que los datos de partida no cubren y se ha decidido):
 - El trabajo duplicado se reduce con **visibilidad, no con bloqueo**: no se impide coger una tarea que ya tiene otra persona, solo se pide confirmación (FR-4). Es un supuesto que la métrica de éxito no mide.
 - Una tarea **hecha no tiene responsable**: lo que importa es quién está en qué ahora, no quién la cerró.
 - Una persona puede tener varias tareas en curso a la vez.
 - Un espacio único: varios equipos, o gente que esté en más de uno, quedan fuera del MVP.
 
 **Riesgos:**
-1. **La información se queda vieja.** Si nadie actualiza, el producto pierde el sentido. Es el riesgo #1 a validar. La mitigación es que actualizar cueste dos clics (NFR-2), no obligar a nadie.
+1. **La información se queda vieja.** Si nadie actualiza, el producto pierde el sentido. Es el riesgo #1 a validar. La mitigación es que actualizar cueste como mucho dos clics (NFR-2), no obligar a nadie.
 2. **El equipo sigue usando el gestor anterior en paralelo.** La doble actualización es como muere esta categoría. El MVP tiene que bastar por sí solo.
 3. **Cualquiera que se registre entra en el espacio.** El alta es abierta, no hay invitaciones y todos tienen los mismos permisos, así que un desconocido podría ver, editar o borrar cualquier tarea. Se asume para la semana de prueba con un equipo concreto. Si el producto sale de ahí, las invitaciones dejan de ser opcionales.
