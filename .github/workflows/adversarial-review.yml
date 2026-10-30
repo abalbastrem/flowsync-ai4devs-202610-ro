@@ -1,0 +1,57 @@
+name: Adversarial review
+
+# Runs the adversarial-reviewer subagent on a PR and leaves one comment.
+# Advisory only: it is not a required check and never blocks a merge.
+#
+# To keep usage low it does not run on every push. It runs when a PR is
+# opened (not as draft), when a draft is marked ready for review, or when
+# someone adds the `ai-review` label (remove and re-add it to re-run).
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, labeled]
+
+concurrency:
+  group: adversarial-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: >-
+      (github.event.action == 'labeled' && github.event.label.name == 'ai-review') ||
+      (github.event.action != 'labeled' && !github.event.pull_request.draft)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          # Subscription token from `claude setup-token`: counts against the
+          # plan's usage limits, no per-token billing.
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Act exactly as the reviewer defined in `.claude/agents/adversarial-reviewer.md`:
+            read that file first and follow its instructions. Read `AGENTS.md` and `CLAUDE.md`
+            for the project conventions it refers to.
+
+            Review only this PR's changes (`gh pr diff`), opening the touched files when you
+            need more context. Do not edit any file.
+
+            When done, post exactly ONE comment on the PR with `gh pr comment`, in Spanish:
+            a verdict (pasa / no pasa), then findings prioritized from most to least severe,
+            each with file and line. End with the line:
+            "> Revisión consultiva: no bloquea el merge."
+          claude_args: |
+            --model sonnet
+            --max-turns 30
+            --allowedTools "Read,Grep,Glob,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*)"
