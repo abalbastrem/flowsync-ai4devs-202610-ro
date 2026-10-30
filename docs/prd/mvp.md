@@ -20,7 +20,7 @@ Los miembros de un equipo remoto de 3–10 personas, con roles planos: todos ven
 
 **Criterio de éxito, a una semana de uso real:** el equipo cancela esa ronda de la daily y nadie pide que vuelva. Si la siguen haciendo igual, no funcionó.
 
-**Cómo se mide.** Preguntando al equipo al cabo de la semana, a todos sus miembros: ¿se ha cancelado la ronda?, ¿alguien ha pedido recuperarla?, ¿alguien ha empezado algo que ya tenía otra persona? El MVP no incluye analítica (ver §5).
+**Cómo se mide.** Preguntando al equipo al cabo de la semana, a todos sus miembros: ¿se ha cancelado la ronda?, ¿alguien ha pedido recuperarla? El MVP no incluye analítica (ver §5).
 
 ## 4. Scope
 
@@ -41,7 +41,8 @@ Una vertical fina y usable de punta a punta. FlowSync **sustituye** al gestor de
 | Exclusión | Por qué |
 |---|---|
 | Asignar una tarea a otra persona | La hipótesis es "cojo yo lo que está libre". Asignar a otros es un patrón de lead, y aquí no hay lead. |
-| Bloquear una tarea para que nadie más la coja | Para validar basta con ver que ya está cogida, y la confirmación (FR-4) evita los despistes. Bloquear impone una regla antes de saber si hace falta. Es la exclusión más dudosa (ver riesgo 2). |
+| Bloquear una tarea para que nadie más la coja | Para validar basta con ver que ya está cogida, y la confirmación (FR-4) evita los despistes. Bloquear impone una regla antes de saber si hace falta. |
+| Impedir que dos personas trabajen en lo mismo | El MVP no puede evitarlo: muestra quién tiene cada tarea, y quien trabaja en algo sin cogerlo, o en algo que ya tiene otro, lo hace saltándose la herramienta. |
 | Filtro "mis tareas" | No lo pide la ficha. Con 3–10 personas la lista se lee entera, y el responsable ya se ve en cada tarea. |
 | Vista kanban por columnas | Las columnas no dan información que no dé el filtro por estado. La hipótesis es quién está en qué, no el flujo de trabajo. |
 | Descripción, comentarios y adjuntos | Convierten la lista en un sitio donde se conversa o se documenta, y la hipótesis es de estado, no de discusión ni de documentación. |
@@ -50,7 +51,7 @@ Una vertical fina y usable de punta a punta. FlowSync **sustituye** al gestor de
 | Sprints, estimaciones, épicas, prioridad y orden manual | No dicen quién está en qué, y un equipo que los necesite no es nuestro usuario. |
 | Informes y analítica | No hay nadie arriba que los lea, y no validan nada para los pares. |
 | Historial completo de cada tarea | El resumen de la última visita cubre "qué se ha movido". Lo que pasó antes de eso no ayuda a decidir qué coger hoy. |
-| Varios equipos o espacios, invitaciones, roles y permisos | Con un espacio único y roles planos el caso de estudio ya se valida. El precio es el riesgo 4. |
+| Varios equipos o espacios, invitaciones, roles y permisos | Con un espacio único y roles planos el caso de estudio ya se valida. El precio es el riesgo 3. |
 | Estados configurables | Configurar es justo el "rollo de Jira" que se quiere evitar. |
 | Integraciones con Git, CI o calendario, e importar del gestor anterior | Es otro producto, con OAuth de terceros. Además, el estado lo cambia a mano quien hace la tarea, con un par de clics, en vez de derivarse de señales externas. |
 | Versión para móvil | El trabajo, y la lista que hace de cola, viven en el escritorio. Una versión móvil no cambia la hipótesis. |
@@ -62,9 +63,9 @@ Una vertical fina y usable de punta a punta. FlowSync **sustituye** al gestor de
 Palabras clave según [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119): **MUST** es un requisito absoluto; **SHOULD** admite excepciones con un motivo entendido y aceptado; **MAY** es opcional.
 
 **Lista y tareas**
-- **FR-1** Todo usuario autenticado MUST ver la misma lista. Cada tarea MUST mostrar título, responsable (o "libre"), estado y fecha de vencimiento si la tiene.
+- **FR-1** Todo usuario autenticado MUST ver la misma lista. Cada tarea MUST mostrar título, responsable, estado y fecha de vencimiento si la tiene. Sin responsable, una tarea pendiente MUST mostrarse como "libre" y una hecha como "—" (MUST NOT aparecer como "libre").
 - **FR-2** La lista MUST ordenarse por fecha de creación, de la más reciente a la más antigua.
-- **FR-3** Crear una tarea MUST requerir solo el título. La tarea MUST nacer pendiente, sin responsable y sin fecha de vencimiento.
+- **FR-3** Crear una tarea MUST requerir solo el título, que MUST NOT estar vacío ni hecho solo de espacios. La tarea MUST nacer pendiente, sin responsable y sin fecha de vencimiento.
 
 **Estado y responsable**
 - **FR-4** Coger una tarea MUST ponerla en curso con quien la coge como responsable. Si ya está en curso con otra persona, el sistema MUST pedir confirmación antes de cambiar el responsable.
@@ -72,39 +73,38 @@ Palabras clave según [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119): **MUST
   - Pasar a **en curso**, desde cualquier estado, MUST asignar la tarea a quien hace el cambio (equivale a cogerla, FR-4).
   - Pasar a **pendiente** o a **hecha** MUST dejar la tarea sin responsable.
   - Cambiar el estado de una tarea en curso de otra persona MUST pedir confirmación.
-- **FR-6** Si la tarea ha cambiado desde que el usuario la vio, cualquier cambio sobre ella MUST mostrar su estado actual y pedir confirmación. Si se confirma, el cambio del usuario MUST prevalecer.
 
 **Edición, borrado y plazos**
-- **FR-7** Cualquier usuario MUST poder editar el título y poner, cambiar o quitar la fecha de vencimiento de cualquier tarea. El título MUST NOT quedar vacío ni hecho solo de espacios.
-- **FR-8** Cualquier usuario MUST poder borrar cualquier tarea, previa confirmación.
-- **FR-9** La fecha de vencimiento es un día, sin hora. Una tarea no hecha cuya fecha es anterior a hoy MUST mostrar la fecha en rojo con la etiqueta "Vencida". Una tarea que vence hoy no está vencida.
+- **FR-6** Cualquier usuario MUST poder editar el título y poner, cambiar o quitar la fecha de vencimiento de cualquier tarea. El título MUST NOT quedar vacío ni hecho solo de espacios.
+- **FR-7** Cualquier usuario MUST poder borrar cualquier tarea, previa confirmación.
+- **FR-8** La fecha de vencimiento es un día, sin hora. Una tarea no hecha cuya fecha es anterior a hoy MUST mostrar la fecha en rojo con la etiqueta "Vencida". Una tarea que vence hoy no está vencida.
 
 **Filtro, frescura y resumen**
-- **FR-10** La lista MUST poder filtrarse con un selector de valores fijos: todas, pendiente, en curso y hecha. Por defecto MUST mostrar todas.
-- **FR-11** Las creaciones, ediciones, cambios de estado y borrados de otros MUST aparecer en la lista sin que el usuario recargue.
-- **FR-12** Encima de la lista, y separado de ella, MUST aparecer un resumen de los cambios que otros han hecho desde la última visita del usuario: creaciones, cambios de estado o responsable, ediciones y borrados. Cada entrada MUST decir quién, qué tarea, qué cambió y cuándo, de la más reciente a la más antigua. Si no hay cambios, MUST decirlo.
+- **FR-9** La lista MUST poder filtrarse con un selector de valores fijos: todas, pendiente, en curso y hecha. Por defecto MUST mostrar todas.
+- **FR-10** Las creaciones, ediciones, cambios de estado y borrados de otros MUST aparecer en la lista sin que el usuario recargue.
+- **FR-11** Encima de la lista, y separado de ella, MUST aparecer un resumen de los cambios que otros han hecho desde la última visita del usuario: creaciones, cambios de estado o responsable, ediciones y borrados. Cada entrada MUST decir quién, qué tarea y qué cambió, de la más reciente a la más antigua, y MAY decir cuándo. Si no hay cambios, MUST decirlo.
+
+Los casos límite (concurrencia, primera visita, errores de red, longitudes máximas…) se definen en los criterios de aceptación de cada Story, no en este documento.
 
 ## 7. Requisitos no funcionales
 
 - **NFR-1 Frescura.** Un cambio hecho por un usuario MUST ser visible en la lista de los demás usuarios con la app abierta en ≤ 5 s.
-- **NFR-2 Coste de actualizar.** Coger una tarea o cambiarle el estado MUST requerir como máximo dos clics desde la lista (contando la confirmación cuando la hay), sin campos obligatorios. Crear una tarea MUST requerir solo escribir el título y confirmar.
+- **NFR-2 Coste de actualizar.** Coger una tarea o cambiarle el estado MUST requerir como máximo dos clics desde la lista, sin campos obligatorios. Cuando hay confirmación (FR-4, FR-5), MAY añadir un clic más. Crear una tarea MUST requerir solo escribir el título y confirmar.
 - **NFR-3 Acceso.** Ver y modificar tareas MUST requerir una sesión iniciada.
-- **NFR-4 Sin presencia.** El producto MUST NOT mostrar quién está conectado ni indicadores de actividad de las personas. Mostrar quién hizo un cambio en una tarea (FR-12) es información de la tarea, no de presencia.
+- **NFR-4 Sin presencia.** El producto MUST NOT mostrar quién está conectado ni indicadores de actividad de las personas. Mostrar quién hizo un cambio en una tarea (FR-11) es información de la tarea, no de presencia.
 - **NFR-5 Rendimiento.** La lista SHOULD cargar en < 2 s con 200 tareas, en un portátil y una conexión de oficina normales.
 - **NFR-6 Navegadores.** El producto SHOULD funcionar en las dos últimas versiones de Chrome, Firefox, Safari y Edge de escritorio.
 
 ## 8. Supuestos y riesgos
 
 **Supuestos** (lo que la ficha no cubre y se ha decidido):
-- Evitar el trabajo duplicado es **visibilidad, no bloqueo**: no se impide coger una tarea que ya tiene otra persona, solo se pide confirmación (FR-4).
+- El trabajo duplicado se reduce con **visibilidad, no con bloqueo**: no se impide coger una tarea que ya tiene otra persona, solo se pide confirmación (FR-4).
 - Una tarea **hecha no tiene responsable**: lo que importa es quién está en qué ahora, no quién la cerró.
 - Una persona puede tener varias tareas en curso a la vez.
-- **Última visita** es la vez anterior que el usuario abrió la app. Mientras la tiene abierta, los cambios llegan a la lista (FR-11) y no al resumen.
-- El MVP solo evita el solapamiento si las tareas son **lo bastante concretas** para decir qué se toca. Dos tareas distintas sobre el mismo módulo, como en el episodio original, no se detectan.
+- **Última visita** es la vez anterior que el usuario abrió la app. Mientras la tiene abierta, los cambios llegan a la lista (FR-10) y no al resumen.
 - Un espacio único: varios equipos, o gente que esté en más de uno, quedan fuera del MVP.
 
 **Riesgos:**
 1. **La información se queda vieja.** Si nadie actualiza, el producto pierde el sentido. Es el riesgo #1 a validar. La mitigación es que actualizar cueste dos clics (NFR-2), no obligar a nadie.
-2. **La visibilidad no basta para evitar el trabajo duplicado.** Puede pasar si alguien coge una tarea ajena y la otra persona no se entera, o si alguien trabaja en algo sin marcarlo. Ninguno de los dos casos deja rastro en la app, así que se pregunta al equipo al final de la semana (§3). Si aparece aunque sea un caso, entra el bloqueo.
-3. **El equipo sigue usando el gestor anterior en paralelo.** La doble actualización es como muere esta categoría. El MVP tiene que bastar por sí solo.
-4. **Cualquiera que se registre entra en el espacio.** El alta es abierta, no hay invitaciones y todos tienen los mismos permisos, así que un desconocido podría ver, editar o borrar cualquier tarea. Se asume para la semana de prueba con un equipo concreto. Si el producto sale de ahí, las invitaciones dejan de ser opcionales.
+2. **El equipo sigue usando el gestor anterior en paralelo.** La doble actualización es como muere esta categoría. El MVP tiene que bastar por sí solo.
+3. **Cualquiera que se registre entra en el espacio.** El alta es abierta, no hay invitaciones y todos tienen los mismos permisos, así que un desconocido podría ver, editar o borrar cualquier tarea. Se asume para la semana de prueba con un equipo concreto. Si el producto sale de ahí, las invitaciones dejan de ser opcionales.
