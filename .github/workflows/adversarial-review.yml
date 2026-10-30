@@ -25,7 +25,6 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-      id-token: write
     steps:
       - uses: actions/checkout@v6
         with:
@@ -36,6 +35,9 @@ jobs:
           # Subscription token from `claude setup-token`: counts against the
           # plan's usage limits, no per-token billing.
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Comment as github-actions[bot] with the run's own token, so the
+          # Claude GitHub App doesn't need to be installed on the repo.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
