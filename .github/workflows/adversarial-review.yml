@@ -6,13 +6,23 @@ name: Adversarial review
 # To keep usage low it does not run on every push. It runs when a PR is
 # opened (not as draft), when a draft is marked ready for review, or when
 # someone adds the `ai-review` label (remove and re-add it to re-run).
+#
+# Only works for PRs from branches of this repo: GitHub does not pass secrets
+# to `pull_request` runs from forks, so those runs fail without commenting.
+# Do not switch to `pull_request_target` to "fix" it: it would run the prompt
+# with secrets over untrusted code.
 
 on:
   pull_request:
     types: [opened, ready_for_review, labeled]
 
+# One review per PR at a time. Runs that will skip the job (any label other
+# than `ai-review`) get their own group, so they can't cancel a running review.
 concurrency:
-  group: adversarial-review-${{ github.event.pull_request.number }}
+  group: >-
+    adversarial-review-${{ github.event.pull_request.number }}-${{
+    (github.event.action != 'labeled' || github.event.label.name == 'ai-review')
+    && 'review' || github.run_id }}
   cancel-in-progress: true
 
 jobs:

@@ -131,4 +131,4 @@ La URL de la API sale de `VITE_API_URL` (ver `frontend/.env.example`); por defec
 - Al cerrar la tarea: usar la skill `/commit`, luego `gh pr create` con una descripción completa de los cambios en el cuerpo del PR.
 - Después de abrir el PR: la revisión adversarial la hace el workflow `.github/workflows/adversarial-review.yml` (al abrir el PR, al marcarlo listo o con la etiqueta `ai-review`), que deja un comentario consultivo. Esperar ese comentario, leerlo (`gh pr view <n> --comments`) y resumírselo al usuario con el enlace, antes de darlo por terminado. No lanzar además el subagente `adversarial-reviewer` en local, salvo que el workflow falle o haga falta pasarle contexto que el CI no tiene.
 - Para descartar un hallazgo concreto, comentar en el PR `ai-review: ignorar — <tema>. <motivo>` (solo cuentan los del propietario del repo); la siguiente ronda no lo vuelve a reportar.
-- No repitas ese resumen en el chat: la sesión se va a perder, el PR no. Responde solo con la URL del PR.
+- No repitas en el chat la descripción de cambios del PR: la sesión se va a perder, el PR no. Responde con la URL del PR y el resumen del comentario del revisor, con su enlace.
