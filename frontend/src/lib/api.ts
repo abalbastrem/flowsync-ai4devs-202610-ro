@@ -110,7 +110,7 @@ function toApiError(status: number, body: unknown): ApiError {
 }
 
 type RequestOptions = {
-  method?: 'GET' | 'POST' | 'PATCH'
+  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: unknown
   token?: string | null
 }
@@ -192,6 +192,12 @@ export function takeTask(token: string, id: number): Promise<Task> {
     method: 'POST',
     token,
   }).then((response) => response.data)
+}
+
+export function deleteTask(token: string, id: number): Promise<void> {
+  return request(`/api/v1/tasks/${id}`, { method: 'DELETE', token }).then(
+    () => undefined,
+  )
 }
 
 export function updateTaskTitle(

@@ -24,6 +24,7 @@ export interface ApiDefinition {
       store: typeof routes['tasks.tasks.store']
       take: typeof routes['tasks.tasks.take']
       update: typeof routes['tasks.tasks.update']
+      destroy: typeof routes['tasks.tasks.destroy']
     }
   }
 }

@@ -30,6 +30,14 @@ export default class TasksController {
     return serialize(TaskTransformer.transform(task))
   }
 
+  async destroy({ params, response }: HttpContext) {
+    const task = await Task.findOrFail(params.id)
+
+    await task.delete()
+
+    return response.noContent()
+  }
+
   async update({ auth, params, request, serialize }: HttpContext) {
     const { title, status } = await request.validateUsing(updateTaskValidator)
     const task = await Task.findOrFail(params.id)

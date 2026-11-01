@@ -6,6 +6,7 @@ import { AuthContext, type AuthContextValue } from '@/auth/auth-context'
 import {
   ApiError,
   createTask,
+  deleteTask,
   getTasks,
   takeTask,
   updateTaskStatus,
@@ -21,6 +22,7 @@ vi.mock('@/lib/api', async (importOriginal) => ({
   takeTask: vi.fn(),
   updateTaskStatus: vi.fn(),
   updateTaskTitle: vi.fn(),
+  deleteTask: vi.fn(),
 }))
 
 const statusOf = (title: string) =>
@@ -680,6 +682,142 @@ describe('editing a task title', () => {
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
     expect(screen.getByText('Ada Lovelace')).toBeInTheDocument()
   })
+})
+
+describe('deleting a task', () => {
+  const aTask = task({ id: 7, title: 'A task' })
+
+  beforeEach(() => {
+    vi.mocked(getTasks).mockReset().mockResolvedValue([aTask])
+    vi.mocked(deleteTask).mockReset()
+  })
+
+  const askToDelete = async (value = auth()) => {
+    const user = userEvent.setup()
+    renderAt('/tasks', value)
+    await user.click(
+      await screen.findByRole('button', { name: 'Borrar A task' }),
+    )
+    return user
+  }
+
+  it('removes the task from the list when I confirm', async () => {
+    vi.mocked(deleteTask).mockResolvedValue()
+    const user = await askToDelete()
+
+    await user.click(await screen.findByRole('button', { name: 'Borrar' }))
+
+    await waitFor(() =>
+      expect(screen.queryByText('A task')).not.toBeInTheDocument(),
+    )
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(deleteTask).toHaveBeenCalledWith('a-token', 7)
+  })
+
+  it('sends nothing and keeps the task when I cancel', async () => {
+    const user = await askToDelete()
+
+    await user.click(await screen.findByRole('button', { name: 'Cancelar' }))
+
+    await waitFor(() =>
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument(),
+    )
+    expect(screen.getByText('A task')).toBeInTheDocument()
+    expect(deleteTask).not.toHaveBeenCalled()
+  })
+
+  it('says who has the task if it is in progress with someone else', async () => {
+    vi.mocked(getTasks).mockResolvedValue([
+      {
+        ...aTask,
+        status: 'in_progress',
+        assignee: { id: 2, fullName: 'Ada Lovelace', initials: 'AL' },
+      },
+    ])
+    await askToDelete()
+
+    expect(await screen.findByRole('alertdialog')).toHaveTextContent(
+      'Ada Lovelace',
+    )
+  })
+
+  it('shows the error and keeps the task if deleting fails', async () => {
+    vi.mocked(deleteTask).mockRejectedValue(new ApiError('Sin conexión.', 0))
+    const user = await askToDelete()
+
+    await user.click(await screen.findByRole('button', { name: 'Borrar' }))
+
+    expect(await screen.findByText('Sin conexión.')).toBeInTheDocument()
+    expect(screen.getByText('A task')).toBeInTheDocument()
+  })
+
+  it('closes the session if deleting gets a 401', async () => {
+    vi.mocked(deleteTask).mockRejectedValue(new ApiError('Caducada.', 401))
+    const value = auth()
+    const user = await askToDelete(value)
+
+    await user.click(await screen.findByRole('button', { name: 'Borrar' }))
+
+    await waitFor(() => expect(value.logout).toHaveBeenCalled())
+  })
+})
+
+describe('a task someone else has just deleted', () => {
+  const aTask = task({ id: 7, title: 'A task' })
+  const gone = new ApiError('No encontrada.', 404)
+
+  beforeEach(() => {
+    vi.mocked(getTasks).mockReset().mockResolvedValue([aTask])
+    vi.mocked(takeTask).mockReset().mockRejectedValue(gone)
+    vi.mocked(updateTaskStatus).mockReset().mockRejectedValue(gone)
+    vi.mocked(updateTaskTitle).mockReset().mockRejectedValue(gone)
+    vi.mocked(deleteTask).mockReset().mockRejectedValue(gone)
+  })
+
+  const actions: [
+    string,
+    (user: ReturnType<typeof userEvent.setup>) => Promise<void>,
+  ][] = [
+    [
+      'taking it',
+      (user) => user.click(screen.getByRole('button', { name: 'Take' })),
+    ],
+    [
+      'changing its status',
+      (user) => user.selectOptions(statusOf('A task'), 'Hecha'),
+    ],
+    [
+      'editing its title',
+      async (user) => {
+        await user.click(screen.getByRole('button', { name: 'Editar A task' }))
+        await user.click(screen.getByRole('button', { name: 'Guardar' }))
+      },
+    ],
+    [
+      'deleting it',
+      async (user) => {
+        await user.click(screen.getByRole('button', { name: 'Borrar A task' }))
+        await user.click(await screen.findByRole('button', { name: 'Borrar' }))
+      },
+    ],
+  ]
+
+  it.each(actions)(
+    'says it no longer exists and removes it from the list when %s',
+    async (_, act) => {
+      const user = userEvent.setup()
+      renderAt('/tasks')
+      await screen.findByText('A task')
+
+      await act(user)
+
+      expect(
+        await screen.findByText('Esta tarea ya no existe.'),
+      ).toBeInTheDocument()
+      expect(screen.queryByText('A task')).not.toBeInTheDocument()
+      expect(screen.queryByRole('textbox', { name: /Título/ })).toBeNull()
+    },
+  )
 })
 
 describe('changing a task someone else is on', () => {
