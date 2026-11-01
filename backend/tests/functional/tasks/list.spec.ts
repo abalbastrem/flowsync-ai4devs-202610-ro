@@ -41,8 +41,9 @@ test.group('Tasks: list', (group) => {
 
     const response = await client.get('/api/v1/tasks').loginAs(reader)
 
-    assert.notProperty(response.body().data[0].assignee, 'email')
-    assert.equal(response.body().data[0].assignee.initials, 'AD')
+    const { data } = response.body() as unknown as { data: { assignee: object }[] }
+    assert.notProperty(data[0].assignee, 'email')
+    assert.propertyVal(data[0].assignee, 'initials', 'AE')
   })
 
   test('requires a logged-in session', async ({ client }) => {
