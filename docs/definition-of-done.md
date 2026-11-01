@@ -24,10 +24,14 @@ TDD happens in the Subtasks. The Story's G/W/T criteria say what must end up tes
 
 ## Size
 
-Every Story carries a `size:S`, `size:M` or `size:L` label. Sizes aren't used to plan or prioritize: they check that a Story fits in one PR that can be reviewed calmly.
+Every Story carries a `size:S`, `size:M` or `size:L` label. Sizes aren't used to plan or prioritize: they check that the work can be reviewed calmly.
 
 - **S:** a small change on existing pieces.
 - **M:** a full vertical slice (data, API, UI, tests) that still fits in one reviewable PR.
-- **L:** doesn't fit. Split it before starting.
+- **L:** doesn't fit in one PR.
 
-No Story starts while labelled `size:L`.
+An L Story is split into smaller Stories when they would each deliver value on their own. When it can't be split that way, it stays whole, with several Subtasks delivered in more than one PR.
+
+## Technical decisions
+
+A cross-cutting technical decision is recorded in a document, not in a ticket. The work of applying it is a Subtask of the first Story that needs it.
