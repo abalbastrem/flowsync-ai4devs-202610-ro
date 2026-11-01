@@ -58,10 +58,7 @@ test.group('Tasks: change status', (group) => {
         assigneeId: user.id,
       })
 
-      const response = await client
-        .patch(`/api/v1/tasks/${task.id}`)
-        .json({ status })
-        .loginAs(user)
+      const response = await client.patch(`/api/v1/tasks/${task.id}`).json({ status }).loginAs(user)
 
       response.assertStatus(200)
       response.assertBodyContains({ data: { status, assignee: null } })
