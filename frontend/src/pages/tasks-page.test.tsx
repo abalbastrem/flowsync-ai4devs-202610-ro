@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthContext, type AuthContextValue } from '@/auth/auth-context'
-import { ApiError, createTask, getTasks } from '@/lib/api'
+import { ApiError, createTask, getTasks, takeTask } from '@/lib/api'
 import { AppRoutes } from '@/routes/app-routes'
 import type { Task } from '@/lib/types'
 
@@ -11,6 +11,7 @@ vi.mock('@/lib/api', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/api')>()),
   getTasks: vi.fn(),
   createTask: vi.fn(),
+  takeTask: vi.fn(),
 }))
 
 const task = (overrides: Partial<Task>): Task => ({
@@ -201,5 +202,68 @@ describe('when a request fails', () => {
       await screen.findByText('Todavía no hay tareas.'),
     ).toBeInTheDocument()
     expect(screen.queryByText('Cargando tareas…')).not.toBeInTheDocument()
+  })
+})
+
+describe('taking a task', () => {
+  const me = { id: 1, fullName: 'Grace Hopper', initials: 'GH' }
+
+  beforeEach(() => {
+    vi.mocked(getTasks).mockReset()
+    vi.mocked(takeTask).mockReset()
+  })
+
+  it('shows a free task in progress with me as its assignee after one click', async () => {
+    vi.mocked(getTasks).mockResolvedValue([task({ id: 7, title: 'Free task' })])
+    vi.mocked(takeTask).mockResolvedValue(
+      task({ id: 7, title: 'Free task', status: 'in_progress', assignee: me }),
+    )
+    const user = userEvent.setup()
+
+    renderAt('/tasks')
+    await user.click(await screen.findByRole('button', { name: 'Take' }))
+
+    expect(await screen.findByText('Grace Hopper')).toBeInTheDocument()
+    expect(screen.getByText('En curso')).toBeInTheDocument()
+    expect(screen.queryByText('Libre')).not.toBeInTheDocument()
+    expect(takeTask).toHaveBeenCalledWith('a-token', 7)
+  })
+
+  it('does not offer Take on a task in progress assigned to me', async () => {
+    vi.mocked(getTasks).mockResolvedValue([
+      task({ title: 'My task', status: 'in_progress', assignee: me }),
+    ])
+
+    renderAt('/tasks')
+
+    expect(await screen.findByText('My task')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Take' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('shows an assignee with no name by their initials', async () => {
+    vi.mocked(getTasks).mockResolvedValue([
+      task({
+        status: 'in_progress',
+        assignee: { id: 2, fullName: null, initials: 'AL' },
+      }),
+    ])
+
+    renderAt('/tasks')
+
+    expect(await screen.findByText('AL')).toBeInTheDocument()
+  })
+
+  it('closes the session if taking a task gets a 401', async () => {
+    vi.mocked(getTasks).mockResolvedValue([task({ title: 'Free task' })])
+    vi.mocked(takeTask).mockRejectedValue(new ApiError('Caducada.', 401))
+    const value = auth()
+    const user = userEvent.setup()
+
+    renderAt('/tasks', value)
+    await user.click(await screen.findByRole('button', { name: 'Take' }))
+
+    await waitFor(() => expect(value.logout).toHaveBeenCalled())
   })
 })

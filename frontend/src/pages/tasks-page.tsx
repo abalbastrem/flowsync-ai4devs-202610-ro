@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ApiError, createTask, getTasks } from '@/lib/api'
+import { ApiError, createTask, getTasks, takeTask } from '@/lib/api'
 import type { Task, TaskStatus } from '@/lib/types'
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
@@ -83,6 +83,25 @@ export function TasksPage() {
     })
   }
 
+  const handleTake = async (id: number) => {
+    if (!token) return
+
+    setError(null)
+    try {
+      const taken = await takeTask(token, id)
+      setTasks((current) =>
+        (current ?? []).map((task) => (task.id === id ? taken : task)),
+      )
+    } catch (cause) {
+      closeExpiredSession(cause, logout)
+      setError(
+        cause instanceof ApiError
+          ? cause.message
+          : 'Algo ha ido mal. Inténtalo de nuevo.',
+      )
+    }
+  }
+
   const alertMessage = formError ?? error
 
   return (
@@ -154,6 +173,15 @@ export function TasksPage() {
                       <span className="text-muted-foreground">
                         {dueDateFormatter.format(new Date(task.dueDate))}
                       </span>
+                    )}
+                    {task.status === 'pending' && !task.assignee && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleTake(task.id)}
+                      >
+                        Take
+                      </Button>
                     )}
                   </li>
                 ))}

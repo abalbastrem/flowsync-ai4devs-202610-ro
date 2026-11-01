@@ -42,6 +42,12 @@ const routes = {
     tokens: [{"old":"/api/v1/tasks","type":0,"val":"api","end":""},{"old":"/api/v1/tasks","type":0,"val":"v1","end":""},{"old":"/api/v1/tasks","type":0,"val":"tasks","end":""}],
     types: placeholder as Registry['tasks.tasks.store']['types'],
   },
+  'tasks.tasks.take': {
+    methods: ["POST"],
+    pattern: '/api/v1/tasks/:id/take',
+    tokens: [{"old":"/api/v1/tasks/:id/take","type":0,"val":"api","end":""},{"old":"/api/v1/tasks/:id/take","type":0,"val":"v1","end":""},{"old":"/api/v1/tasks/:id/take","type":0,"val":"tasks","end":""},{"old":"/api/v1/tasks/:id/take","type":1,"val":"id","end":""},{"old":"/api/v1/tasks/:id/take","type":0,"val":"take","end":""}],
+    types: placeholder as Registry['tasks.tasks.take']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

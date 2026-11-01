@@ -19,4 +19,14 @@ export default class TasksController {
 
     return serialize(TaskTransformer.transform(task))
   }
+
+  async take({ auth, params, serialize }: HttpContext) {
+    const task = await Task.findOrFail(params.id)
+
+    task.startBy(auth.getUserOrFail())
+    await task.save()
+    await task.load('assignee')
+
+    return serialize(TaskTransformer.transform(task))
+  }
 }
