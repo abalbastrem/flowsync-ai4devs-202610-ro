@@ -101,3 +101,15 @@ Los casos límite (concurrencia, primera visita, errores de red, longitudes máx
 1. **La información se queda vieja.** Si nadie actualiza, el producto pierde el sentido. Es el riesgo #1 a validar. La mitigación es que actualizar cueste como mucho dos clics (NFR-2), no obligar a nadie.
 2. **El equipo sigue usando el gestor anterior en paralelo.** La doble actualización es como muere esta categoría. El MVP tiene que bastar por sí solo.
 3. **Cualquiera que se registre entra en el espacio.** El alta es abierta, no hay invitaciones y todos tienen los mismos permisos, así que un desconocido podría ver, editar o borrar cualquier tarea. Se asume para la semana de prueba con un equipo concreto. Si el producto sale de ahí, las invitaciones dejan de ser opcionales.
+
+## 9. Desglose
+
+El detalle de la ejecución vive en Jira. Cualquier cambio de alcance se hace primero en este documento.
+
+| Epic | Requisitos |
+|---|---|
+| [FLOW-4 Shared task list](https://bulbastre.atlassian.net/browse/FLOW-4) | FR-1, FR-2, FR-4, FR-5 · NFR-3, NFR-5 |
+| [FLOW-5 Who's on what](https://bulbastre.atlassian.net/browse/FLOW-5) | FR-3, FR-6, FR-7 · NFR-1, NFR-2 |
+| [FLOW-6 What has moved](https://bulbastre.atlassian.net/browse/FLOW-6) | FR-8 · NFR-4 |
+
+NFR-6 es transversal: no pertenece a ninguna Epic y se comprueba mediante la Definition of Done de las Stories.
