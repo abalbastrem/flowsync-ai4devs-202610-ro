@@ -97,6 +97,21 @@ test.group('Tasks: change status', (group) => {
     assert.equal(task.status, 'pending')
   })
 
+  test('rejects an empty status and leaves the task unchanged', async ({ client, assert }) => {
+    const user = await createUser()
+    const task = await Task.create({ title: 'Free task', status: 'pending' })
+
+    const response = await client
+      .patch(`/api/v1/tasks/${task.id}`)
+      .json({ status: '' })
+      .loginAs(user)
+
+    response.assertStatus(422)
+
+    await task.refresh()
+    assert.equal(task.status, 'pending')
+  })
+
   test('requires a logged-in session', async ({ client }) => {
     const task = await Task.create({ title: 'Free task', status: 'pending' })
 

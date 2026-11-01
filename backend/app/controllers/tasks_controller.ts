@@ -1,5 +1,5 @@
 import Task from '#models/task'
-import { createTaskValidator, updateTaskStatusValidator } from '#validators/task'
+import { createTaskValidator, updateTaskValidator } from '#validators/task'
 import type { HttpContext } from '@adonisjs/core/http'
 import TaskTransformer from '#transformers/task_transformer'
 
@@ -31,10 +31,11 @@ export default class TasksController {
   }
 
   async update({ auth, params, request, serialize }: HttpContext) {
-    const { status } = await request.validateUsing(updateTaskStatusValidator)
+    const { title, status } = await request.validateUsing(updateTaskValidator)
     const task = await Task.findOrFail(params.id)
 
-    task.changeStatus(status, auth.getUserOrFail())
+    if (title !== undefined) task.title = title
+    if (status !== undefined) task.changeStatus(status, auth.getUserOrFail())
     await task.save()
     await task.load('assignee')
 
