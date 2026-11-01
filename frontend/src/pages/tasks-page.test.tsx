@@ -405,3 +405,142 @@ describe('changing a task status', () => {
     expect(statusOf('A task')).toHaveValue('done')
   })
 })
+
+describe('changing a task someone else is on', () => {
+  const ada = { id: 2, fullName: 'Ada Lovelace', initials: 'AL' }
+  const me = { id: 1, fullName: 'Grace Hopper', initials: 'GH' }
+  const adasTask = task({
+    id: 7,
+    title: 'A task',
+    status: 'in_progress',
+    assignee: ada,
+  })
+
+  beforeEach(() => {
+    vi.mocked(getTasks).mockReset().mockResolvedValue([adasTask])
+    vi.mocked(takeTask).mockReset()
+    vi.mocked(updateTaskStatus).mockReset()
+  })
+
+  const openList = async () => {
+    const user = userEvent.setup()
+    renderAt('/tasks')
+    await screen.findByText('A task')
+    return user
+  }
+
+  it('asks to confirm and says who has it when taking the task', async () => {
+    const user = await openList()
+
+    await user.click(screen.getByRole('button', { name: 'Take' }))
+
+    expect(await screen.findByRole('alertdialog')).toHaveTextContent(
+      'Ada Lovelace',
+    )
+    expect(takeTask).not.toHaveBeenCalled()
+  })
+
+  it('asks to confirm and says who has it when changing the status', async () => {
+    const user = await openList()
+
+    await user.selectOptions(statusOf('A task'), 'Hecha')
+
+    expect(await screen.findByRole('alertdialog')).toHaveTextContent(
+      'Ada Lovelace',
+    )
+    expect(updateTaskStatus).not.toHaveBeenCalled()
+  })
+
+  it('says who has it by their initials if they have no name', async () => {
+    vi.mocked(getTasks).mockResolvedValue([
+      { ...adasTask, assignee: { ...ada, fullName: null } },
+    ])
+    const user = await openList()
+
+    await user.selectOptions(statusOf('A task'), 'Hecha')
+
+    expect(await screen.findByRole('alertdialog')).toHaveTextContent('AL')
+  })
+
+  it('takes the task when I confirm', async () => {
+    vi.mocked(takeTask).mockResolvedValue({ ...adasTask, assignee: me })
+    const user = await openList()
+
+    await user.click(screen.getByRole('button', { name: 'Take' }))
+    await user.click(await screen.findByRole('button', { name: 'Continuar' }))
+
+    expect(await screen.findByText('Grace Hopper')).toBeInTheDocument()
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(takeTask).toHaveBeenCalledWith('a-token', 7)
+  })
+
+  it('changes the status when I confirm', async () => {
+    vi.mocked(updateTaskStatus).mockResolvedValue({
+      ...adasTask,
+      status: 'done',
+      assignee: null,
+    })
+    const user = await openList()
+
+    await user.selectOptions(statusOf('A task'), 'Hecha')
+    await user.click(await screen.findByRole('button', { name: 'Continuar' }))
+
+    await waitFor(() => expect(statusOf('A task')).toHaveValue('done'))
+    expect(updateTaskStatus).toHaveBeenCalledWith('a-token', 7, 'done')
+  })
+
+  it('sends nothing and keeps the task as it was when I cancel a status change', async () => {
+    const user = await openList()
+
+    await user.selectOptions(statusOf('A task'), 'Hecha')
+    await user.click(await screen.findByRole('button', { name: 'Cancelar' }))
+
+    await waitFor(() =>
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument(),
+    )
+    expect(updateTaskStatus).not.toHaveBeenCalled()
+    expect(statusOf('A task')).toHaveValue('in_progress')
+    expect(screen.getByText('Ada Lovelace')).toBeInTheDocument()
+  })
+
+  it('sends nothing when I cancel taking the task', async () => {
+    const user = await openList()
+
+    await user.click(screen.getByRole('button', { name: 'Take' }))
+    await user.click(await screen.findByRole('button', { name: 'Cancelar' }))
+
+    await waitFor(() =>
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument(),
+    )
+    expect(takeTask).not.toHaveBeenCalled()
+    expect(screen.getByText('Ada Lovelace')).toBeInTheDocument()
+  })
+
+  it('does not ask to confirm when the task is mine', async () => {
+    vi.mocked(getTasks).mockResolvedValue([{ ...adasTask, assignee: me }])
+    vi.mocked(updateTaskStatus).mockResolvedValue({
+      ...adasTask,
+      status: 'done',
+      assignee: null,
+    })
+    const user = await openList()
+
+    await user.selectOptions(statusOf('A task'), 'Hecha')
+
+    await waitFor(() =>
+      expect(updateTaskStatus).toHaveBeenCalledWith('a-token', 7, 'done'),
+    )
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+  })
+
+  it('does not ask to confirm when the task is free', async () => {
+    vi.mocked(getTasks).mockResolvedValue([task({ id: 7, title: 'A task' })])
+    vi.mocked(takeTask).mockResolvedValue({ ...adasTask, assignee: me })
+    const user = await openList()
+
+    await user.click(screen.getByRole('button', { name: 'Take' }))
+
+    await waitFor(() => expect(takeTask).toHaveBeenCalledWith('a-token', 7))
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+  })
+})

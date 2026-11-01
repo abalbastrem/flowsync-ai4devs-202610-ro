@@ -5,6 +5,16 @@ import { useAuth } from '@/auth/use-auth'
 import { useAuthForm } from '@/auth/use-auth-form'
 import { FieldError } from '@/components/field-error'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -48,11 +58,15 @@ function closeExpiredSession(cause: unknown, logout: () => Promise<void>) {
 }
 
 export function TasksPage() {
-  const { token, logout } = useAuth()
+  const { token, user, logout } = useAuth()
   const [tasks, setTasks] = useState<Task[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [title, setTitle] = useState('')
   const [isUpdating, setIsUpdating] = useState(false)
+  const [pendingChange, setPendingChange] = useState<{
+    holder: string
+    apply: () => void
+  } | null>(null)
   const { isSubmitting, formError, fieldErrors, submit, failWith } =
     useAuthForm(FIELDS)
 
@@ -121,6 +135,25 @@ export function TasksPage() {
       )
     } finally {
       setIsUpdating(false)
+    }
+  }
+
+  const isSomeoneElses = (task: Task) =>
+    task.status === 'in_progress' &&
+    task.assignee !== null &&
+    task.assignee.id !== user?.id
+
+  /** Cambiar una tarea en curso de otra persona pide confirmación antes (FR-3). */
+  const requestChange = (
+    task: Task,
+    change: (token: string) => Promise<Task>,
+  ) => {
+    const apply = () => void updateTask(task.id, change)
+
+    if (isSomeoneElses(task)) {
+      setPendingChange({ holder: assigneeLabel(task), apply })
+    } else {
+      apply()
     }
   }
 
@@ -193,15 +226,14 @@ export function TasksPage() {
                       className="border-input bg-background h-8 rounded-md border px-2 text-sm disabled:opacity-50"
                       value={task.status}
                       disabled={isUpdating}
-                      onChange={(event) =>
-                        updateTask(task.id, (token) =>
-                          updateTaskStatus(
-                            token,
-                            task.id,
-                            event.target.value as TaskStatus,
-                          ),
+                      onChange={(event) => {
+                        // Al esperar la confirmación, React ya habrá devuelto
+                        // el selector al estado anterior: hay que leerlo ahora.
+                        const status = event.target.value as TaskStatus
+                        requestChange(task, (token) =>
+                          updateTaskStatus(token, task.id, status),
                         )
-                      }
+                      }}
                     >
                       {TASK_STATUSES.map((status) => (
                         <option key={status} value={status}>
@@ -214,13 +246,13 @@ export function TasksPage() {
                         {dueDateFormatter.format(new Date(task.dueDate))}
                       </span>
                     )}
-                    {task.status === 'pending' && !task.assignee && (
+                    {(task.status === 'pending' || isSomeoneElses(task)) && (
                       <Button
                         variant="outline"
                         size="sm"
                         disabled={isUpdating}
                         onClick={() =>
-                          updateTask(task.id, (token) =>
+                          requestChange(task, (token) =>
                             takeTask(token, task.id),
                           )
                         }
@@ -233,6 +265,32 @@ export function TasksPage() {
               </ul>
             </CardContent>
           </Card>
+        )}
+
+        {pendingChange && (
+          <AlertDialog
+            open
+            onOpenChange={(open) => {
+              if (!open) setPendingChange(null)
+            }}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  ¿Cambiar una tarea de otra persona?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {pendingChange.holder} tiene esta tarea en curso.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={pendingChange.apply}>
+                  Continuar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         )}
       </div>
     </div>
