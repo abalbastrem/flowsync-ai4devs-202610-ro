@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -143,5 +143,63 @@ describe('creating a task', () => {
     await submit('Fix login')
 
     expect(await screen.findByText('Título no válido.')).toBeInTheDocument()
+  })
+})
+
+describe('when a request fails', () => {
+  beforeEach(() => {
+    vi.mocked(getTasks).mockReset()
+    vi.mocked(createTask).mockReset()
+  })
+
+  it('shows the error and does not offer to create tasks if the list fails to load', async () => {
+    vi.mocked(getTasks).mockRejectedValue(new ApiError('Sin conexión.', 0))
+
+    renderAt('/tasks')
+
+    expect(await screen.findByText('Sin conexión.')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Nueva tarea')).not.toBeInTheDocument()
+  })
+
+  it('closes the session if loading the list gets a 401', async () => {
+    vi.mocked(getTasks).mockRejectedValue(new ApiError('Caducada.', 401))
+    const value = auth()
+
+    renderAt('/tasks', value)
+
+    await waitFor(() => expect(value.logout).toHaveBeenCalled())
+  })
+
+  it('closes the session if creating a task gets a 401', async () => {
+    vi.mocked(getTasks).mockResolvedValue([])
+    vi.mocked(createTask).mockRejectedValue(new ApiError('Caducada.', 401))
+    const value = auth()
+    const user = userEvent.setup()
+
+    renderAt('/tasks', value)
+    await user.type(await screen.findByLabelText('Nueva tarea'), 'Fix login')
+    await user.click(screen.getByRole('button', { name: 'Crear' }))
+
+    await waitFor(() => expect(value.logout).toHaveBeenCalled())
+  })
+
+  it('tells loading apart from an empty list', async () => {
+    let resolve: (tasks: Task[]) => void = () => {}
+    vi.mocked(getTasks).mockReturnValue(
+      new Promise((resolver) => {
+        resolve = resolver
+      }),
+    )
+
+    renderAt('/tasks')
+
+    expect(screen.getByText('Cargando tareas…')).toBeInTheDocument()
+
+    resolve([])
+
+    expect(
+      await screen.findByText('Todavía no hay tareas.'),
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Cargando tareas…')).not.toBeInTheDocument()
   })
 })
