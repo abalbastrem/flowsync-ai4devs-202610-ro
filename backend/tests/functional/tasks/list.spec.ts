@@ -34,6 +34,17 @@ test.group('Tasks: list', (group) => {
     })
   })
 
+  test('does not expose the email of the assignee', async ({ client, assert }) => {
+    const reader = await User.create({ email: 'reader@example.com', password: 'password123' })
+    const assignee = await User.create({ email: 'ada@example.com', password: 'password123' })
+    await Task.create({ title: 'Taken task', status: 'in_progress', assigneeId: assignee.id })
+
+    const response = await client.get('/api/v1/tasks').loginAs(reader)
+
+    assert.notProperty(response.body().data[0].assignee, 'email')
+    assert.equal(response.body().data[0].assignee.initials, 'AD')
+  })
+
   test('requires a logged-in session', async ({ client }) => {
     const response = await client.get('/api/v1/tasks')
 
