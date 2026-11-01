@@ -1,14 +1,16 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthContext, type AuthContextValue } from '@/auth/auth-context'
-import { getTasks } from '@/lib/api'
+import { ApiError, createTask, getTasks } from '@/lib/api'
 import { AppRoutes } from '@/routes/app-routes'
 import type { Task } from '@/lib/types'
 
 vi.mock('@/lib/api', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/api')>()),
   getTasks: vi.fn(),
+  createTask: vi.fn(),
 }))
 
 const task = (overrides: Partial<Task>): Task => ({
@@ -95,5 +97,51 @@ describe('task list page', () => {
 
     expect(screen.getByText('Inicia sesión')).toBeInTheDocument()
     expect(getTasks).not.toHaveBeenCalled()
+  })
+})
+
+describe('creating a task', () => {
+  beforeEach(() => {
+    vi.mocked(getTasks).mockReset().mockResolvedValue([])
+    vi.mocked(createTask).mockReset()
+  })
+
+  const submit = async (title: string) => {
+    const user = userEvent.setup()
+    renderAt('/tasks')
+
+    const input = await screen.findByLabelText('Nueva tarea')
+    if (title) await user.type(input, title)
+    await user.click(screen.getByRole('button', { name: 'Crear' }))
+  }
+
+  it('adds the new task to the list when submitting a title', async () => {
+    vi.mocked(createTask).mockResolvedValue(task({ title: 'Fix login' }))
+
+    await submit('Fix login')
+
+    expect(await screen.findByText('Fix login')).toBeInTheDocument()
+    expect(createTask).toHaveBeenCalledWith('a-token', 'Fix login')
+    expect(screen.getByLabelText('Nueva tarea')).toHaveValue('')
+  })
+
+  it.each([
+    ['empty', ''],
+    ['blank', '   '],
+  ])('creates nothing and shows an error for a %s title', async (_, title) => {
+    await submit(title)
+
+    expect(await screen.findByText('Escribe un título.')).toBeInTheDocument()
+    expect(createTask).not.toHaveBeenCalled()
+  })
+
+  it('shows the error when the server rejects the title', async () => {
+    vi.mocked(createTask).mockRejectedValue(
+      new ApiError('Título no válido.', 422, { title: 'Título no válido.' }),
+    )
+
+    await submit('Fix login')
+
+    expect(await screen.findByText('Título no válido.')).toBeInTheDocument()
   })
 })
