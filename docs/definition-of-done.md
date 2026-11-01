@@ -31,7 +31,3 @@ Every Story carries a `size:S`, `size:M` or `size:L` label. Sizes aren't used to
 - **L:** doesn't fit in one PR.
 
 An L Story is split into smaller Stories when they would each deliver value on their own. When it can't be split that way, it stays whole, with several Subtasks delivered in more than one PR.
-
-## Technical decisions
-
-A cross-cutting technical decision is recorded in a document, not in a ticket. The work of applying it is a Subtask of the first Story that needs it.
