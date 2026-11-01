@@ -1,4 +1,10 @@
-import type { AuthResult, LoginPayload, SignupPayload, User } from '@/lib/types'
+import type {
+  AuthResult,
+  LoginPayload,
+  SignupPayload,
+  Task,
+  User,
+} from '@/lib/types'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
@@ -35,6 +41,7 @@ const FIELD_LABELS: Record<string, string> = {
   email: 'el email',
   password: 'la contraseña',
   passwordConfirmation: 'la confirmación de la contraseña',
+  title: 'el título',
 }
 
 const label = (field?: string) => FIELD_LABELS[field ?? ''] ?? 'el campo'
@@ -163,4 +170,18 @@ export function logout(token: string): Promise<void> {
   return request('/api/v1/account/logout', { method: 'POST', token }).then(
     () => undefined,
   )
+}
+
+export function getTasks(token: string): Promise<Task[]> {
+  return request<{ data: Task[] }>('/api/v1/tasks', { token }).then(
+    (response) => response.data,
+  )
+}
+
+export function createTask(token: string, title: string): Promise<Task> {
+  return request<{ data: Task }>('/api/v1/tasks', {
+    method: 'POST',
+    body: { title },
+    token,
+  }).then((response) => response.data)
 }
