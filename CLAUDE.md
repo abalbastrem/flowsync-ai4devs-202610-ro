@@ -103,6 +103,7 @@ Rutas actuales (`start/routes.ts`), todas bajo `/api/v1`:
 | POST | `/api/v1/tasks` | `TasksController.store` | sí |
 | POST | `/api/v1/tasks/:id/take` | `TasksController.take` | sí |
 | PATCH | `/api/v1/tasks/:id` | `TasksController.update` | sí |
+| DELETE | `/api/v1/tasks/:id` | `TasksController.destroy` | sí |
 
 ### Validación
 
