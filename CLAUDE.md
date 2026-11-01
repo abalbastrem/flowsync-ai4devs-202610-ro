@@ -127,6 +127,7 @@ Organización de `src/`:
 La URL de la API sale de `VITE_API_URL` (ver `frontend/.env.example`); por defecto `http://localhost:3333`.
 
 ## Reglas de proceso
+- Una Story no está terminada hasta cumplir `docs/definition-of-done.md` (criterios G/W/T, TDD con el test en rojo antes que el código, y tamaño).
 - Antes de tocar código: crear una rama nueva (`git checkout -b feat/<slug>`). Nunca commitear directo en `main`/`s1/start`.
 - Al cerrar la tarea: usar la skill `/commit`, luego `gh pr create` con una descripción completa de los cambios en el cuerpo del PR.
 - Después de abrir el PR: la revisión adversarial la hace el workflow `.github/workflows/adversarial-review.yml` (al abrir el PR, al marcarlo listo o con la etiqueta `ai-review`), que deja un comentario consultivo. Esperar ese comentario, leerlo (`gh pr view <n> --comments`) y resumírselo al usuario con el enlace, antes de darlo por terminado. No lanzar además el subagente `adversarial-reviewer` en local, salvo que el workflow falle o haga falta pasarle contexto que el CI no tiene. Si en 15 minutos no hay comentario, comprobar `gh run list`: un PR en borrador no se revisa hasta marcarlo listo o ponerle la etiqueta `ai-review`, y una rama base sin el workflow no lo ejecuta.
