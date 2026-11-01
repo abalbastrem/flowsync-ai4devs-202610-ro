@@ -185,3 +185,10 @@ export function createTask(token: string, title: string): Promise<Task> {
     token,
   }).then((response) => response.data)
 }
+
+export function takeTask(token: string, id: number): Promise<Task> {
+  return request<{ data: Task }>(`/api/v1/tasks/${id}/take`, {
+    method: 'POST',
+    token,
+  }).then((response) => response.data)
+}
