@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
-import { AlertCircleIcon, PencilIcon } from 'lucide-react'
+import { AlertCircleIcon, PencilIcon, Trash2Icon } from 'lucide-react'
 import { useAuth } from '@/auth/use-auth'
 import { useAuthForm } from '@/auth/use-auth-form'
 import { FieldError } from '@/components/field-error'
@@ -22,6 +22,7 @@ import { Label } from '@/components/ui/label'
 import {
   ApiError,
   createTask,
+  deleteTask,
   getTasks,
   takeTask,
   updateTaskStatus,
@@ -81,7 +82,9 @@ export function TasksPage() {
     error: string | null
   } | null>(null)
   const [pendingChange, setPendingChange] = useState<{
-    holder: string
+    title: string
+    description: string
+    confirmLabel: string
     apply: () => void
   } | null>(null)
   const { isSubmitting, formError, fieldErrors, submit, failWith } =
@@ -132,9 +135,13 @@ export function TasksPage() {
     })
   }
 
+  const removeFromList = (id: number) =>
+    setTasks((current) => (current ?? []).filter((task) => task.id !== id))
+
+  /** `change` resuelve con la tarea actualizada, o con `null` si ya no existe. */
   const updateTask = async (
     id: number,
-    change: (token: string) => Promise<Task>,
+    change: (token: string) => Promise<Task | null>,
   ) => {
     if (!token) return false
 
@@ -142,17 +149,28 @@ export function TasksPage() {
     setIsUpdating(true)
     try {
       const updated = await change(token)
-      setTasks((current) =>
-        (current ?? []).map((task) => (task.id === id ? updated : task)),
-      )
+      if (updated) {
+        setTasks((current) =>
+          (current ?? []).map((task) => (task.id === id ? updated : task)),
+        )
+      } else {
+        removeFromList(id)
+      }
       return true
     } catch (cause) {
       closeExpiredSession(cause, logout)
-      setError(
-        cause instanceof ApiError
-          ? cause.message
-          : 'Algo ha ido mal. Inténtalo de nuevo.',
-      )
+      if (cause instanceof ApiError && cause.status === 404) {
+        // Otra persona la ha borrado mientras seguía en esta pantalla.
+        removeFromList(id)
+        setEditing((current) => (current?.id === id ? null : current))
+        setError('Esta tarea ya no existe.')
+      } else {
+        setError(
+          cause instanceof ApiError
+            ? cause.message
+            : 'Algo ha ido mal. Inténtalo de nuevo.',
+        )
+      }
       return false
     } finally {
       setIsUpdating(false)
@@ -189,10 +207,31 @@ export function TasksPage() {
     const apply = () => void updateTask(task.id, change)
 
     if (isSomeoneElses(task)) {
-      setPendingChange({ holder: assigneeLabel(task), apply })
+      setPendingChange({
+        title: '¿Cambiar una tarea de otra persona?',
+        description: `${assigneeLabel(task)} tiene esta tarea en curso.`,
+        confirmLabel: 'Continuar',
+        apply,
+      })
     } else {
       apply()
     }
+  }
+
+  const requestDelete = (task: Task) => {
+    const holder = isSomeoneElses(task)
+      ? `${assigneeLabel(task)} tiene esta tarea en curso. `
+      : ''
+
+    setPendingChange({
+      title: '¿Borrar esta tarea?',
+      description: `${holder}«${task.title}» se borrará y no se podrá recuperar.`,
+      confirmLabel: 'Borrar',
+      apply: () =>
+        void updateTask(task.id, (token) =>
+          deleteTask(token, task.id).then(() => null),
+        ),
+    })
   }
 
   const alertMessage = formError ?? error
@@ -342,6 +381,16 @@ export function TasksPage() {
                         >
                           <PencilIcon />
                         </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-7 shrink-0"
+                          aria-label={`Borrar ${task.title}`}
+                          disabled={isUpdating}
+                          onClick={() => requestDelete(task)}
+                        >
+                          <Trash2Icon />
+                        </Button>
                       </span>
                     )}
                     <span className="text-muted-foreground">
@@ -402,17 +451,15 @@ export function TasksPage() {
           >
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>
-                  ¿Cambiar una tarea de otra persona?
-                </AlertDialogTitle>
+                <AlertDialogTitle>{pendingChange.title}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  {pendingChange.holder} tiene esta tarea en curso.
+                  {pendingChange.description}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
                 <AlertDialogAction onClick={pendingChange.apply}>
-                  Continuar
+                  {pendingChange.confirmLabel}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
