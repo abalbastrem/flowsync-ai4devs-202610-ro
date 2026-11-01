@@ -41,7 +41,7 @@ Una vertical fina y usable de punta a punta. FlowSync **sustituye** al gestor de
 | Exclusión | Por qué |
 |---|---|
 | Asignar una tarea a otra persona | La hipótesis es "cojo yo lo que está libre". Asignar a otros es un patrón de lead, y aquí no hay lead. |
-| Bloquear una tarea para que nadie más la coja | Para validar basta con ver que ya está cogida, y la confirmación al coger o cambiar de estado una tarea ajena (FR-4) evita los despistes. Bloquear impone una regla antes de saber si hace falta. |
+| Bloquear una tarea para que nadie más la coja | Para validar basta con ver que ya está cogida, y la confirmación al coger o cambiar de estado una tarea ajena (FR-3) evita los despistes. Bloquear impone una regla antes de saber si hace falta. |
 | Impedir que dos personas trabajen en lo mismo | El MVP no puede evitarlo: muestra quién tiene cada tarea, y quien trabaja en algo sin cogerlo, o en algo que ya tiene otro, lo hace saltándose la herramienta. |
 | Filtro "mis tareas" | No lo piden los datos de partida. Con 3–10 personas la lista se lee entera, y el responsable ya se ve en cada tarea. |
 | Vista kanban por columnas | Las columnas no dan información que no dé el filtro por estado. La hipótesis es quién está en qué, no el flujo de trabajo. |
@@ -64,20 +64,19 @@ Palabras clave según [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119): **MUST
 
 **Lista y tareas**
 - **FR-1** Todo usuario autenticado MUST ver la misma lista. Cada tarea MUST mostrar título, responsable, estado y fecha de vencimiento si la tiene. Una tarea hecha MUST NOT presentarse como disponible.
-- **FR-2** La lista MUST mostrar primero las tareas más recientes.
-- **FR-3** Una tarea MUST tener siempre título. Crearla MUST requerir solo eso, y nace pendiente y sin responsable.
+- **FR-2** Una tarea MUST tener siempre título. Crearla MUST requerir solo eso, y nace pendiente y sin responsable.
 
 **Estado y responsable**
-- **FR-4** Una tarea tiene responsable si y solo si está en curso. Ponerla en curso (cogerla) MUST asignarla a quien lo hace; pasarla a pendiente o hecha MUST dejarla sin responsable. Coger o cambiar el estado de una tarea en curso de otra persona MUST pedir confirmación.
+- **FR-3** Una tarea tiene responsable si y solo si está en curso. Ponerla en curso (cogerla) MUST asignarla a quien lo hace; pasarla a pendiente o hecha MUST dejarla sin responsable. Coger o cambiar el estado de una tarea en curso de otra persona MUST pedir confirmación.
 
 **Edición, borrado y plazos**
-- **FR-5** Cualquier usuario MUST poder editar el título y la fecha de vencimiento de cualquier tarea, y borrarla previa confirmación.
-- **FR-6** La fecha de vencimiento es un día, sin hora. Una tarea no hecha con la fecha pasada MUST distinguirse a simple vista como vencida.
+- **FR-4** Cualquier usuario MUST poder editar el título y la fecha de vencimiento de cualquier tarea, y borrarla previa confirmación.
+- **FR-5** La fecha de vencimiento es un día, sin hora. Una tarea no hecha con la fecha pasada MUST distinguirse a simple vista como vencida.
 
 **Filtro, frescura y resumen**
-- **FR-7** La lista MUST poder filtrarse por estado.
-- **FR-8** Los cambios de otros MUST aparecer en la lista sin que el usuario recargue.
-- **FR-9** Encima de la lista, y separado de ella, MUST aparecer un resumen general, en forma de lista, de los cambios que otros han hecho mientras el usuario no estaba. Cada entrada MUST decir quién, en qué tarea y qué cambió.
+- **FR-6** La lista MUST poder filtrarse por estado.
+- **FR-7** Los cambios de otros MUST aparecer en la lista sin que el usuario recargue.
+- **FR-8** Encima de la lista, y separado de ella, MUST aparecer un resumen general, en forma de lista, de los cambios que otros han hecho mientras el usuario no estaba. Cada entrada MUST decir quién, en qué tarea y qué cambió.
 
 Los casos límite (concurrencia, primera visita, errores de red, longitudes máximas…) se definen en los criterios de aceptación de cada Story, no en este documento.
 
@@ -86,14 +85,14 @@ Los casos límite (concurrencia, primera visita, errores de red, longitudes máx
 - **NFR-1 Frescura.** Un cambio hecho por un usuario MUST ser visible en la lista de los demás usuarios con la app abierta en ≤ 5 s.
 - **NFR-2 Coste de actualizar.** Coger una tarea MUST requerir un clic. Cambiarle el estado SHOULD requerir como máximo dos. En ambos casos, sin contar la confirmación.
 - **NFR-3 Acceso.** Ver y modificar tareas MUST requerir una sesión iniciada.
-- **NFR-4 Sin presencia.** El producto MUST NOT mostrar quién está conectado ni indicadores de actividad de las personas. Mostrar quién hizo un cambio en una tarea (FR-9) es información de la tarea, no de presencia.
+- **NFR-4 Sin presencia.** El producto MUST NOT mostrar quién está conectado ni indicadores de actividad de las personas. Mostrar quién hizo un cambio en una tarea (FR-8) es información de la tarea, no de presencia.
 - **NFR-5 Rendimiento.** La lista SHOULD cargar en < 2 s con 200 tareas, en un portátil y una conexión de oficina normales.
 - **NFR-6 Navegadores.** El producto SHOULD funcionar en las dos últimas versiones de Chrome, Firefox, Safari y Edge de escritorio.
 
 ## 8. Supuestos y riesgos
 
 **Supuestos** (lo que los datos de partida no cubren y se ha decidido):
-- El trabajo duplicado se reduce con **visibilidad, no con bloqueo**: no se impide coger una tarea que ya tiene otra persona, solo se pide confirmación (FR-4). Es un supuesto que la métrica de éxito no mide.
+- El trabajo duplicado se reduce con **visibilidad, no con bloqueo**: no se impide coger una tarea que ya tiene otra persona, solo se pide confirmación (FR-3). Es un supuesto que la métrica de éxito no mide.
 - Una tarea **hecha no tiene responsable**: lo que importa es quién está en qué ahora, no quién la cerró.
 - Una persona puede tener varias tareas en curso a la vez.
 - Un espacio único: varios equipos, o gente que esté en más de uno, quedan fuera del MVP.
