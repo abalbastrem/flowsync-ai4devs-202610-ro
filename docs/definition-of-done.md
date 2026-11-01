@@ -14,8 +14,10 @@ NFR-6 (browsers) is split: Chrome on every Story, and one pass on the latest two
 
 ## TDD
 
-- Every G/W/T criterion becomes at least one test, named after the criterion.
-- The test is written first and seen failing. Commit it on its own (`test:`) before the code that makes it pass (`feat:`), so the history shows it failed first.
+TDD happens in the Subtasks. The Story's G/W/T criteria say what must end up tested; the Subtasks are where the tests get written.
+
+- Every G/W/T criterion ends up covered by at least one test, named after the criterion.
+- Each Subtask that changes behaviour starts with a failing test. Commit it on its own (`test:`) before the code that makes it pass (`feat:`), so the history shows it failed first.
 - Backend: Japa functional tests. They hit the same SQLite file as the dev server, so isolate them with the `testUtils.db()` hooks.
 - Frontend: Vitest and Testing Library.
 - End to end: Playwright, only where a single session can't prove the behaviour (real-time updates between two sessions).
