@@ -26,7 +26,7 @@ npm run format                                  # prettier --write
 npm run typecheck                               # tsc --noEmit
 ```
 
-Tests (Japa). Dos suites declaradas en `adonisrc.ts`: `unit` (`tests/unit/**/*.spec.ts`, timeout 2s) y `functional` (`tests/functional/**/*.spec.ts`, timeout 30s). **Ninguno de los dos directorios existe todavía** — solo está `tests/bootstrap.ts`.
+Tests (Japa). Dos suites declaradas en `adonisrc.ts`: `unit` (`tests/unit/**/*.spec.ts`, timeout 2s) y `functional` (`tests/functional/**/*.spec.ts`, timeout 30s). El stack de tests y su porqué están en `docs/adr/0001-test-stack.md`.
 
 ```bash
 node ace test unit                    # una suite
@@ -36,7 +36,7 @@ node ace test --groups=... --tags=... --failed --watch
 node ace make:test --suite=functional # scaffolding de un fichero de test
 ```
 
-Ojo con la BD en tests: `config/database.ts` define una única conexión SQLite apuntando a `app.tmpPath('db.sqlite3')` sin override por entorno, así que las suites functional pegan contra el **mismo fichero** que el servidor de desarrollo. `.env.test` solo cambia `SESSION_DRIVER=memory`. Si añades tests que escriben, aísla con los hooks de `testUtils.db()` (truncate / transacción global) o el estado se filtra entre runs.
+BD en tests: `config/database.ts` usa `tmp/test.sqlite3` cuando `app.inTest`, y `tests/bootstrap.ts` la migra al arrancar la suite. Si añades tests que escriben, aísla con `group.each.setup(() => testUtils.db().withGlobalTransaction())` o el estado se filtra entre tests.
 
 Otros comandos útiles: `node ace list:routes`, `node ace make:controller|model|migration|validator|transformer|service`, `node ace migration:fresh`, `node ace repl`.
 
@@ -46,11 +46,12 @@ Otros comandos útiles: `node ace list:routes`, `node ace make:controller|model|
 npm install
 npm run dev
 npm run build     # tsc -b && vite build (aquí se hace el typecheck)
+npm test          # vitest run
 npm run lint      # oxlint (NO eslint)
 npm run format    # prettier --write .
 ```
 
-No hay runner de tests instalado en el frontend.
+Tests con Vitest y Testing Library (`src/**/*.test.tsx`). Configuración en `vite.config.ts` y `src/test/setup.ts`.
 
 ## Arquitectura del backend
 
@@ -113,7 +114,7 @@ El stack va deliberadamente en versiones muy recientes: **AdonisJS 7, Lucid 22, 
 
 ## Frontend
 
-El typecheck vive dentro de `npm run build`; el lint es **oxlint** (`.oxlintrc.json`), no eslint. El formateo es Prettier (`.prettierrc.json`: `semi: false`, `singleQuote: true`, para respetar el estilo ya existente); un hook `PostToolUse` en `.claude/settings.json` lo corre automáticamente sobre cada fichero de `frontend/` que Claude edite. No hay runner de tests instalado.
+El typecheck vive dentro de `npm run build`; el lint es **oxlint** (`.oxlintrc.json`), no eslint. El formateo es Prettier (`.prettierrc.json`: `semi: false`, `singleQuote: true`, para respetar el estilo ya existente); un hook `PostToolUse` en `.claude/settings.json` lo corre automáticamente sobre cada fichero de `frontend/` que Claude edite.
 
 Stack: **Tailwind v4** (plugin de Vite, sin `tailwind.config.js`; los tokens viven en `src/index.css`), **shadcn/ui** (`components.json`, componentes generados en `src/components/ui/` — se traen con `npx shadcn@latest add <componente>` y no se editan a mano) y **react-router**. El alias `@/*` → `src/*` está declarado a la vez en `tsconfig.app.json` (sin `baseUrl`, deprecado en TS 6) y en `vite.config.ts`.
 
