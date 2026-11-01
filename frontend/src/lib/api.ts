@@ -41,6 +41,7 @@ const FIELD_LABELS: Record<string, string> = {
   email: 'el email',
   password: 'la contraseña',
   passwordConfirmation: 'la confirmación de la contraseña',
+  title: 'el título',
 }
 
 const label = (field?: string) => FIELD_LABELS[field ?? ''] ?? 'el campo'
@@ -175,4 +176,12 @@ export function getTasks(token: string): Promise<Task[]> {
   return request<{ data: Task[] }>('/api/v1/tasks', { token }).then(
     (response) => response.data,
   )
+}
+
+export function createTask(token: string, title: string): Promise<Task> {
+  return request<{ data: Task }>('/api/v1/tasks', {
+    method: 'POST',
+    body: { title },
+    token,
+  }).then((response) => response.data)
 }

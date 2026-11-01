@@ -2,9 +2,14 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import { AlertCircleIcon } from 'lucide-react'
 import { useAuth } from '@/auth/use-auth'
+import { useAuthForm } from '@/auth/use-auth-form'
+import { FieldError } from '@/components/field-error'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ApiError, getTasks } from '@/lib/api'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { ApiError, createTask, getTasks } from '@/lib/api'
 import type { Task, TaskStatus } from '@/lib/types'
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
@@ -20,10 +25,15 @@ const dueDateFormatter = new Intl.DateTimeFormat('es-ES', {
   timeZone: 'UTC',
 })
 
+const FIELDS = ['title'] as const
+
 export function TasksPage() {
   const { token } = useAuth()
   const [tasks, setTasks] = useState<Task[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [title, setTitle] = useState('')
+  const { isSubmitting, formError, fieldErrors, submit, failWith } =
+    useAuthForm(FIELDS)
 
   useEffect(() => {
     // `ProtectedRoute` garantiza que aquí ya hay sesión resuelta.
@@ -49,6 +59,21 @@ export function TasksPage() {
     }
   }, [token])
 
+  const handleCreate = (event: React.FormEvent) => {
+    event.preventDefault()
+
+    if (!title.trim()) return failWith('title', 'Escribe un título.')
+
+    return submit(async () => {
+      // `ProtectedRoute` garantiza que aquí ya hay sesión resuelta.
+      const task = await createTask(token!, title)
+      setTasks((current) => [...(current ?? []), task])
+      setTitle('')
+    })
+  }
+
+  const alertMessage = formError ?? error
+
   return (
     <div className="bg-muted/40 min-h-svh p-6">
       <div className="mx-auto grid w-full max-w-3xl gap-6">
@@ -59,12 +84,30 @@ export function TasksPage() {
           </Link>
         </header>
 
-        {error && (
+        {alertMessage && (
           <Alert variant="destructive">
             <AlertCircleIcon />
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>{alertMessage}</AlertDescription>
           </Alert>
         )}
+
+        <form onSubmit={handleCreate} className="grid gap-2" noValidate>
+          <Label htmlFor="title">Nueva tarea</Label>
+          <div className="flex gap-2">
+            <Input
+              id="title"
+              name="title"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              aria-invalid={Boolean(fieldErrors.title)}
+              aria-describedby={fieldErrors.title ? 'title-error' : undefined}
+            />
+            <Button type="submit" disabled={isSubmitting}>
+              Crear
+            </Button>
+          </div>
+          <FieldError id="title-error" message={fieldErrors.title} />
+        </form>
 
         {tasks && (
           <Card>
