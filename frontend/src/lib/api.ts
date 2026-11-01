@@ -3,6 +3,7 @@ import type {
   LoginPayload,
   SignupPayload,
   Task,
+  TaskStatus,
   User,
 } from '@/lib/types'
 
@@ -109,7 +110,7 @@ function toApiError(status: number, body: unknown): ApiError {
 }
 
 type RequestOptions = {
-  method?: 'GET' | 'POST'
+  method?: 'GET' | 'POST' | 'PATCH'
   body?: unknown
   token?: string | null
 }
@@ -189,6 +190,18 @@ export function createTask(token: string, title: string): Promise<Task> {
 export function takeTask(token: string, id: number): Promise<Task> {
   return request<{ data: Task }>(`/api/v1/tasks/${id}/take`, {
     method: 'POST',
+    token,
+  }).then((response) => response.data)
+}
+
+export function updateTaskStatus(
+  token: string,
+  id: number,
+  status: TaskStatus,
+): Promise<Task> {
+  return request<{ data: Task }>(`/api/v1/tasks/${id}`, {
+    method: 'PATCH',
+    body: { status },
     token,
   }).then((response) => response.data)
 }

@@ -39,6 +39,7 @@ router
         router.get('/', [controllers.Tasks, 'index'])
         router.post('/', [controllers.Tasks, 'store'])
         router.post(':id/take', [controllers.Tasks, 'take'])
+        router.patch(':id', [controllers.Tasks, 'update'])
       })
       .prefix('tasks')
       .as('tasks')

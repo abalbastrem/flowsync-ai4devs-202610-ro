@@ -23,6 +23,7 @@ export interface ApiDefinition {
       index: typeof routes['tasks.tasks.index']
       store: typeof routes['tasks.tasks.store']
       take: typeof routes['tasks.tasks.take']
+      update: typeof routes['tasks.tasks.update']
     }
   }
 }

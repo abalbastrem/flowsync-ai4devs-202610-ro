@@ -91,4 +91,16 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/tasks_controller').default['take']>>>
     }
   }
+  'tasks.tasks.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/tasks/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/task').updateTaskStatusValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/task').updateTaskStatusValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/tasks_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/tasks_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
 }
