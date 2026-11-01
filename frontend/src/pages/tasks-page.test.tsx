@@ -9,6 +9,7 @@ import {
   getTasks,
   takeTask,
   updateTaskStatus,
+  updateTaskTitle,
 } from '@/lib/api'
 import { AppRoutes } from '@/routes/app-routes'
 import type { Task } from '@/lib/types'
@@ -19,6 +20,7 @@ vi.mock('@/lib/api', async (importOriginal) => ({
   createTask: vi.fn(),
   takeTask: vi.fn(),
   updateTaskStatus: vi.fn(),
+  updateTaskTitle: vi.fn(),
 }))
 
 const statusOf = (title: string) =>
@@ -537,6 +539,146 @@ describe('filtering the list by status', () => {
     expect(await screen.findByText('New task')).toBeInTheDocument()
     expect(filterBy('Pendiente')).toHaveAttribute('aria-pressed', 'true')
     expect(visibleTitles()).toEqual(['Pending task', 'New task'])
+  })
+})
+
+describe('editing a task title', () => {
+  const oldTask = task({ id: 7, title: 'Old title' })
+
+  beforeEach(() => {
+    vi.mocked(getTasks).mockReset().mockResolvedValue([oldTask])
+    vi.mocked(updateTaskTitle).mockReset()
+  })
+
+  const startEditing = async () => {
+    const user = userEvent.setup()
+    renderAt('/tasks')
+    await user.click(
+      await screen.findByRole('button', { name: 'Editar Old title' }),
+    )
+    return user
+  }
+
+  const titleField = () =>
+    screen.getByRole('textbox', { name: 'Título de Old title' })
+
+  it('shows the new title after saving', async () => {
+    vi.mocked(updateTaskTitle).mockResolvedValue({
+      ...oldTask,
+      title: 'New title',
+    })
+    const user = await startEditing()
+
+    expect(titleField()).toHaveValue('Old title')
+
+    await user.clear(titleField())
+    await user.type(titleField(), 'New title')
+    await user.click(screen.getByRole('button', { name: 'Guardar' }))
+
+    expect(await screen.findByText('New title')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Guardar' }),
+    ).not.toBeInTheDocument()
+    expect(updateTaskTitle).toHaveBeenCalledWith('a-token', 7, 'New title')
+  })
+
+  it('saves with Enter', async () => {
+    vi.mocked(updateTaskTitle).mockResolvedValue({
+      ...oldTask,
+      title: 'New title',
+    })
+    const user = await startEditing()
+
+    await user.clear(titleField())
+    await user.type(titleField(), 'New title{Enter}')
+
+    expect(await screen.findByText('New title')).toBeInTheDocument()
+  })
+
+  it.each([
+    ['empty', ''],
+    ['blank', '   '],
+  ])('sends nothing and shows an error for a %s title', async (_, title) => {
+    const user = await startEditing()
+
+    await user.clear(titleField())
+    if (title) await user.type(titleField(), title)
+    await user.click(screen.getByRole('button', { name: 'Guardar' }))
+
+    expect(await screen.findByText('Escribe un título.')).toBeInTheDocument()
+    expect(updateTaskTitle).not.toHaveBeenCalled()
+    expect(titleField()).toBeInTheDocument()
+  })
+
+  it('leaves the title as it was and sends nothing when cancelling', async () => {
+    const user = await startEditing()
+
+    await user.clear(titleField())
+    await user.type(titleField(), 'New title')
+    await user.click(screen.getByRole('button', { name: 'Cancelar' }))
+
+    expect(screen.getByText('Old title')).toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: /Título/ })).toBeNull()
+    expect(updateTaskTitle).not.toHaveBeenCalled()
+  })
+
+  it('leaves the title as it was and sends nothing with Esc', async () => {
+    const user = await startEditing()
+
+    await user.type(titleField(), ' changed{Escape}')
+
+    expect(screen.getByText('Old title')).toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: /Título/ })).toBeNull()
+    expect(updateTaskTitle).not.toHaveBeenCalled()
+  })
+
+  it('shows a server error and stays in edit mode, keeping the text', async () => {
+    vi.mocked(updateTaskTitle).mockRejectedValue(
+      new ApiError('Sin conexión.', 0),
+    )
+    const user = await startEditing()
+
+    await user.clear(titleField())
+    await user.type(titleField(), 'New title')
+    await user.click(screen.getByRole('button', { name: 'Guardar' }))
+
+    expect(await screen.findByText('Sin conexión.')).toBeInTheDocument()
+    expect(titleField()).toHaveValue('New title')
+  })
+
+  it('closes the session if saving gets a 401', async () => {
+    vi.mocked(updateTaskTitle).mockRejectedValue(new ApiError('Caducada.', 401))
+    const value = auth()
+    const user = userEvent.setup()
+
+    renderAt('/tasks', value)
+    await user.click(
+      await screen.findByRole('button', { name: 'Editar Old title' }),
+    )
+    await user.click(screen.getByRole('button', { name: 'Guardar' }))
+
+    await waitFor(() => expect(value.logout).toHaveBeenCalled())
+  })
+
+  it('does not ask to confirm on a task someone else is on', async () => {
+    const adasTask = {
+      ...oldTask,
+      status: 'in_progress' as const,
+      assignee: { id: 2, fullName: 'Ada Lovelace', initials: 'AL' },
+    }
+    vi.mocked(getTasks).mockResolvedValue([adasTask])
+    vi.mocked(updateTaskTitle).mockResolvedValue({
+      ...adasTask,
+      title: 'New title',
+    })
+    const user = await startEditing()
+
+    await user.clear(titleField())
+    await user.type(titleField(), 'New title{Enter}')
+
+    expect(await screen.findByText('New title')).toBeInTheDocument()
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(screen.getByText('Ada Lovelace')).toBeInTheDocument()
   })
 })
 

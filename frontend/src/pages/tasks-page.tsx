@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
-import { AlertCircleIcon } from 'lucide-react'
+import { AlertCircleIcon, PencilIcon } from 'lucide-react'
 import { useAuth } from '@/auth/use-auth'
 import { useAuthForm } from '@/auth/use-auth-form'
 import { FieldError } from '@/components/field-error'
@@ -25,6 +25,7 @@ import {
   getTasks,
   takeTask,
   updateTaskStatus,
+  updateTaskTitle,
 } from '@/lib/api'
 import type { Task, TaskStatus } from '@/lib/types'
 
@@ -74,6 +75,11 @@ export function TasksPage() {
   const [title, setTitle] = useState('')
   const [isUpdating, setIsUpdating] = useState(false)
   const [filter, setFilter] = useState<StatusFilter>('all')
+  const [editing, setEditing] = useState<{
+    id: number
+    title: string
+    error: string | null
+  } | null>(null)
   const [pendingChange, setPendingChange] = useState<{
     holder: string
     apply: () => void
@@ -130,7 +136,7 @@ export function TasksPage() {
     id: number,
     change: (token: string) => Promise<Task>,
   ) => {
-    if (!token) return
+    if (!token) return false
 
     setError(null)
     setIsUpdating(true)
@@ -139,6 +145,7 @@ export function TasksPage() {
       setTasks((current) =>
         (current ?? []).map((task) => (task.id === id ? updated : task)),
       )
+      return true
     } catch (cause) {
       closeExpiredSession(cause, logout)
       setError(
@@ -146,9 +153,27 @@ export function TasksPage() {
           ? cause.message
           : 'Algo ha ido mal. Inténtalo de nuevo.',
       )
+      return false
     } finally {
       setIsUpdating(false)
     }
+  }
+
+  const handleSaveTitle = async (event: React.FormEvent) => {
+    event.preventDefault()
+
+    if (!editing) return
+    if (!editing.title.trim()) {
+      setEditing({ ...editing, error: 'Escribe un título.' })
+      return
+    }
+
+    const { id, title: newTitle } = editing
+    const saved = await updateTask(id, (token) =>
+      updateTaskTitle(token, id, newTitle),
+    )
+    // Si falla, la fila sigue en edición para no perder lo escrito.
+    if (saved) setEditing(null)
   }
 
   const isSomeoneElses = (task: Task) =>
@@ -253,9 +278,72 @@ export function TasksPage() {
                     key={task.id}
                     className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 text-sm"
                   >
-                    <span className="min-w-0 flex-1 font-medium">
-                      {task.title}
-                    </span>
+                    {editing?.id === task.id ? (
+                      <form
+                        onSubmit={handleSaveTitle}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Escape') setEditing(null)
+                        }}
+                        className="grid min-w-0 flex-1 basis-full gap-1"
+                        noValidate
+                      >
+                        <div className="flex flex-wrap gap-2">
+                          <Input
+                            aria-label={`Título de ${task.title}`}
+                            className="h-8 min-w-40 flex-1"
+                            value={editing.title}
+                            autoFocus
+                            aria-invalid={Boolean(editing.error)}
+                            aria-describedby={
+                              editing.error ? 'edit-title-error' : undefined
+                            }
+                            onChange={(event) =>
+                              setEditing({
+                                ...editing,
+                                title: event.target.value,
+                                error: null,
+                              })
+                            }
+                          />
+                          <Button type="submit" size="sm" disabled={isUpdating}>
+                            Guardar
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditing(null)}
+                          >
+                            Cancelar
+                          </Button>
+                        </div>
+                        <FieldError
+                          id="edit-title-error"
+                          message={editing.error ?? undefined}
+                        />
+                      </form>
+                    ) : (
+                      <span className="flex min-w-0 flex-1 items-center gap-1 font-medium">
+                        <span className="min-w-0 break-words">
+                          {task.title}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-7 shrink-0"
+                          aria-label={`Editar ${task.title}`}
+                          onClick={() =>
+                            setEditing({
+                              id: task.id,
+                              title: task.title,
+                              error: null,
+                            })
+                          }
+                        >
+                          <PencilIcon />
+                        </Button>
+                      </span>
+                    )}
                     <span className="text-muted-foreground">
                       {assigneeLabel(task)}
                     </span>

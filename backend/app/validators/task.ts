@@ -1,16 +1,26 @@
 import { TASK_STATUSES } from '#models/task'
 import vine from '@vinejs/vine'
+import type { FieldContext } from '@vinejs/vine/types'
+
+const title = () => vine.string().trim().minLength(1).maxLength(255)
+
+/**
+ * `.optional()` alone also accepts null, and the body parser turns empty
+ * strings into null: a blank field would be ignored instead of rejected.
+ */
+const wasSent = (field: FieldContext) => Object.hasOwn(field.parent, field.name)
 
 /**
  * Validator to use when creating a task
  */
 export const createTaskValidator = vine.create({
-  title: vine.string().trim().minLength(1).maxLength(255),
+  title: title(),
 })
 
 /**
- * Validator to use when changing a task's status
+ * Validator to use when updating a task: only the fields sent change
  */
-export const updateTaskStatusValidator = vine.create({
-  status: vine.enum(TASK_STATUSES),
+export const updateTaskValidator = vine.create({
+  title: title().optional().requiredWhen(wasSent),
+  status: vine.enum(TASK_STATUSES).optional().requiredWhen(wasSent),
 })

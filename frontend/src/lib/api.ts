@@ -194,6 +194,18 @@ export function takeTask(token: string, id: number): Promise<Task> {
   }).then((response) => response.data)
 }
 
+export function updateTaskTitle(
+  token: string,
+  id: number,
+  title: string,
+): Promise<Task> {
+  return request<{ data: Task }>(`/api/v1/tasks/${id}`, {
+    method: 'PATCH',
+    body: { title },
+    token,
+  }).then((response) => response.data)
+}
+
 export function updateTaskStatus(
   token: string,
   id: number,
