@@ -3,7 +3,13 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthContext, type AuthContextValue } from '@/auth/auth-context'
-import { ApiError, createTask, getTasks, takeTask } from '@/lib/api'
+import {
+  ApiError,
+  createTask,
+  getTasks,
+  takeTask,
+  updateTaskStatus,
+} from '@/lib/api'
 import { AppRoutes } from '@/routes/app-routes'
 import type { Task } from '@/lib/types'
 
@@ -12,7 +18,11 @@ vi.mock('@/lib/api', async (importOriginal) => ({
   getTasks: vi.fn(),
   createTask: vi.fn(),
   takeTask: vi.fn(),
+  updateTaskStatus: vi.fn(),
 }))
+
+const statusOf = (title: string) =>
+  screen.getByRole('combobox', { name: `Estado de ${title}` })
 
 const task = (overrides: Partial<Task>): Task => ({
   id: 1,
@@ -71,7 +81,7 @@ describe('task list page', () => {
 
     expect(await screen.findByText('Fix login')).toBeInTheDocument()
     expect(screen.getByText('Ada Lovelace')).toBeInTheDocument()
-    expect(screen.getByText('En curso')).toBeInTheDocument()
+    expect(statusOf('Fix login')).toHaveValue('in_progress')
     expect(screen.getByText('5 nov 2026')).toBeInTheDocument()
   })
 
@@ -82,7 +92,7 @@ describe('task list page', () => {
 
     expect(await screen.findByText('Free task')).toBeInTheDocument()
     expect(screen.getByText('Libre')).toBeInTheDocument()
-    expect(screen.getByText('Pendiente')).toBeInTheDocument()
+    expect(statusOf('Free task')).toHaveValue('pending')
   })
 
   it('is the page a logged-in user lands on', async () => {
@@ -224,7 +234,7 @@ describe('taking a task', () => {
     await user.click(await screen.findByRole('button', { name: 'Take' }))
 
     expect(await screen.findByText('Grace Hopper')).toBeInTheDocument()
-    expect(screen.getByText('En curso')).toBeInTheDocument()
+    expect(statusOf('Free task')).toHaveValue('in_progress')
     expect(screen.queryByText('Libre')).not.toBeInTheDocument()
     expect(takeTask).toHaveBeenCalledWith('a-token', 7)
   })
@@ -265,5 +275,133 @@ describe('taking a task', () => {
     await user.click(await screen.findByRole('button', { name: 'Take' }))
 
     await waitFor(() => expect(value.logout).toHaveBeenCalled())
+  })
+})
+
+describe('changing a task status', () => {
+  const me = { id: 1, fullName: 'Grace Hopper', initials: 'GH' }
+
+  beforeEach(() => {
+    vi.mocked(getTasks).mockReset()
+    vi.mocked(updateTaskStatus).mockReset()
+  })
+
+  it('shows me as the assignee when I set a task in progress', async () => {
+    vi.mocked(getTasks).mockResolvedValue([task({ id: 7, title: 'A task' })])
+    vi.mocked(updateTaskStatus).mockResolvedValue(
+      task({ id: 7, title: 'A task', status: 'in_progress', assignee: me }),
+    )
+    const user = userEvent.setup()
+
+    renderAt('/tasks')
+    await screen.findByText('A task')
+    await user.selectOptions(statusOf('A task'), 'En curso')
+
+    expect(await screen.findByText('Grace Hopper')).toBeInTheDocument()
+    expect(statusOf('A task')).toHaveValue('in_progress')
+    expect(updateTaskStatus).toHaveBeenCalledWith('a-token', 7, 'in_progress')
+  })
+
+  it('shows a task as free when I set it to pending', async () => {
+    vi.mocked(getTasks).mockResolvedValue([
+      task({ id: 7, title: 'A task', status: 'in_progress', assignee: me }),
+    ])
+    vi.mocked(updateTaskStatus).mockResolvedValue(
+      task({ id: 7, title: 'A task', status: 'pending' }),
+    )
+    const user = userEvent.setup()
+
+    renderAt('/tasks')
+    await screen.findByText('A task')
+    await user.selectOptions(statusOf('A task'), 'Pendiente')
+
+    expect(await screen.findByText('Libre')).toBeInTheDocument()
+    expect(screen.queryByText('Grace Hopper')).not.toBeInTheDocument()
+    expect(statusOf('A task')).toHaveValue('pending')
+  })
+
+  it('shows a task with no assignee and not as free when I set it to done', async () => {
+    vi.mocked(getTasks).mockResolvedValue([
+      task({ id: 7, title: 'A task', status: 'in_progress', assignee: me }),
+    ])
+    vi.mocked(updateTaskStatus).mockResolvedValue(
+      task({ id: 7, title: 'A task', status: 'done' }),
+    )
+    const user = userEvent.setup()
+
+    renderAt('/tasks')
+    await screen.findByText('A task')
+    await user.selectOptions(statusOf('A task'), 'Hecha')
+
+    expect(await screen.findByText('—')).toBeInTheDocument()
+    expect(screen.queryByText('Grace Hopper')).not.toBeInTheDocument()
+    expect(screen.queryByText('Libre')).not.toBeInTheDocument()
+    expect(statusOf('A task')).toHaveValue('done')
+  })
+
+  it('does not offer Take on a done task', async () => {
+    vi.mocked(getTasks).mockResolvedValue([
+      task({ title: 'Done task', status: 'done' }),
+    ])
+
+    renderAt('/tasks')
+
+    expect(await screen.findByText('Done task')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Take' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('shows the error and keeps the previous status if the change fails', async () => {
+    vi.mocked(getTasks).mockResolvedValue([task({ id: 7, title: 'A task' })])
+    vi.mocked(updateTaskStatus).mockRejectedValue(
+      new ApiError('Sin conexión.', 0),
+    )
+    const user = userEvent.setup()
+
+    renderAt('/tasks')
+    await screen.findByText('A task')
+    await user.selectOptions(statusOf('A task'), 'Hecha')
+
+    expect(await screen.findByText('Sin conexión.')).toBeInTheDocument()
+    expect(statusOf('A task')).toHaveValue('pending')
+  })
+
+  it('closes the session if the change gets a 401', async () => {
+    vi.mocked(getTasks).mockResolvedValue([task({ title: 'A task' })])
+    vi.mocked(updateTaskStatus).mockRejectedValue(
+      new ApiError('Caducada.', 401),
+    )
+    const value = auth()
+    const user = userEvent.setup()
+
+    renderAt('/tasks', value)
+    await screen.findByText('A task')
+    await user.selectOptions(statusOf('A task'), 'Hecha')
+
+    await waitFor(() => expect(value.logout).toHaveBeenCalled())
+  })
+
+  // Dos respuestas que llegan desordenadas dejarían en pantalla el estado que no toca.
+  it('does not allow another change until the current one has finished', async () => {
+    let resolve: (updated: Task) => void = () => {}
+    vi.mocked(getTasks).mockResolvedValue([task({ id: 7, title: 'A task' })])
+    vi.mocked(updateTaskStatus).mockReturnValue(
+      new Promise((resolver) => {
+        resolve = resolver
+      }),
+    )
+    const user = userEvent.setup()
+
+    renderAt('/tasks')
+    await screen.findByText('A task')
+    await user.selectOptions(statusOf('A task'), 'Hecha')
+
+    expect(statusOf('A task')).toBeDisabled()
+
+    resolve(task({ id: 7, title: 'A task', status: 'done' }))
+
+    await waitFor(() => expect(statusOf('A task')).toBeEnabled())
+    expect(statusOf('A task')).toHaveValue('done')
   })
 })
