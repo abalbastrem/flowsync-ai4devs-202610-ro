@@ -406,6 +406,140 @@ describe('changing a task status', () => {
   })
 })
 
+describe('filtering the list by status', () => {
+  const me = { id: 1, fullName: 'Grace Hopper', initials: 'GH' }
+  const pendingTask = task({ id: 1, title: 'Pending task' })
+  const activeTask = task({
+    id: 2,
+    title: 'Active task',
+    status: 'in_progress',
+    assignee: me,
+  })
+  const doneTask = task({ id: 3, title: 'Done task', status: 'done' })
+
+  const filterBy = (name: string) => screen.getByRole('button', { name })
+
+  const openList = async (tasks = [pendingTask, activeTask, doneTask]) => {
+    vi.mocked(getTasks).mockResolvedValue(tasks)
+    const user = userEvent.setup()
+    renderAt('/tasks')
+    await screen.findByRole('button', { name: 'Todas' })
+    return user
+  }
+
+  const visibleTitles = () =>
+    ['Pending task', 'Active task', 'Done task', 'New task'].filter((title) =>
+      screen.queryByText(title),
+    )
+
+  beforeEach(() => {
+    vi.mocked(getTasks).mockReset()
+    vi.mocked(takeTask).mockReset()
+    vi.mocked(createTask).mockReset()
+  })
+
+  it('shows all tasks by default', async () => {
+    await openList()
+
+    expect(visibleTitles()).toEqual([
+      'Pending task',
+      'Active task',
+      'Done task',
+    ])
+    expect(filterBy('Todas')).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it.each([
+    ['Pendiente', 'Pending task'],
+    ['En curso', 'Active task'],
+    ['Hecha', 'Done task'],
+  ])(
+    'shows only the matching tasks when filtering by %s',
+    async (name, title) => {
+      const user = await openList()
+
+      await user.click(filterBy(name))
+
+      expect(visibleTitles()).toEqual([title])
+      expect(filterBy(name)).toHaveAttribute('aria-pressed', 'true')
+      expect(filterBy('Todas')).toHaveAttribute('aria-pressed', 'false')
+    },
+  )
+
+  it('shows all tasks again when removing the filter', async () => {
+    const user = await openList()
+
+    await user.click(filterBy('Hecha'))
+    await user.click(filterBy('Todas'))
+
+    expect(visibleTitles()).toEqual([
+      'Pending task',
+      'Active task',
+      'Done task',
+    ])
+  })
+
+  it('says no task has that status when none matches', async () => {
+    const user = await openList([pendingTask])
+
+    await user.click(filterBy('Hecha'))
+
+    expect(
+      screen.getByText('No hay tareas con este estado.'),
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Todavía no hay tareas.')).not.toBeInTheDocument()
+  })
+
+  it('takes a task out of the view when it stops matching the filter', async () => {
+    vi.mocked(takeTask).mockResolvedValue({
+      ...pendingTask,
+      status: 'in_progress',
+      assignee: me,
+    })
+    const user = await openList([pendingTask])
+
+    await user.click(filterBy('Pendiente'))
+    await user.click(screen.getByRole('button', { name: 'Take' }))
+
+    await waitFor(() =>
+      expect(screen.queryByText('Pending task')).not.toBeInTheDocument(),
+    )
+    expect(
+      screen.getByText('No hay tareas con este estado.'),
+    ).toBeInTheDocument()
+  })
+
+  it.each(['En curso', 'Hecha'])(
+    'goes back to all tasks when creating one with the %s filter on',
+    async (name) => {
+      vi.mocked(createTask).mockResolvedValue(
+        task({ id: 4, title: 'New task' }),
+      )
+      const user = await openList()
+
+      await user.click(filterBy(name))
+      await user.type(screen.getByLabelText('Nueva tarea'), 'New task')
+      await user.click(screen.getByRole('button', { name: 'Crear' }))
+
+      expect(await screen.findByText('New task')).toBeInTheDocument()
+      expect(filterBy('Todas')).toHaveAttribute('aria-pressed', 'true')
+    },
+  )
+
+  it('keeps the pending filter when creating a task, since the new task matches it', async () => {
+    vi.mocked(createTask).mockResolvedValue(task({ id: 4, title: 'New task' }))
+    const user = await openList()
+
+    await user.click(filterBy('Pendiente'))
+    await user.type(screen.getByLabelText('Nueva tarea'), 'New task')
+    await user.click(screen.getByRole('button', { name: 'Crear' }))
+
+    expect(await screen.findByText('New task')).toBeInTheDocument()
+    expect(filterBy('Pendiente')).toHaveAttribute('aria-pressed', 'true')
+    expect(visibleTitles()).toEqual(['Pending task', 'New task'])
+  })
+})
+
 describe('changing a task someone else is on', () => {
   const ada = { id: 2, fullName: 'Ada Lovelace', initials: 'AL' }
   const me = { id: 1, fullName: 'Grace Hopper', initials: 'GH' }
