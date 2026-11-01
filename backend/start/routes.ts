@@ -38,6 +38,7 @@ router
       .group(() => {
         router.get('/', [controllers.Tasks, 'index'])
         router.post('/', [controllers.Tasks, 'store'])
+        router.post(':id/take', [controllers.Tasks, 'take'])
       })
       .prefix('tasks')
       .as('tasks')

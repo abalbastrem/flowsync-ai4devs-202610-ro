@@ -22,6 +22,7 @@ export interface ApiDefinition {
     tasks: {
       index: typeof routes['tasks.tasks.index']
       store: typeof routes['tasks.tasks.store']
+      take: typeof routes['tasks.tasks.take']
     }
   }
 }
