@@ -117,8 +117,8 @@ export function TasksPage() {
         const task = await createTask(token, title)
         setTasks((current) => [...(current ?? []), task])
         setTitle('')
-        // Una tarea nueva nace pendiente: con otro filtro parecería no haberse creado.
-        if (filter !== 'pending') setFilter('all')
+        // Con un filtro que no la muestra, parecería no haberse creado.
+        if (filter !== task.status) setFilter('all')
       } catch (cause) {
         closeExpiredSession(cause, logout)
         throw cause
