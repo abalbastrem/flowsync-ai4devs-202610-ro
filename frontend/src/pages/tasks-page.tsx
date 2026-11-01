@@ -36,6 +36,16 @@ const STATUS_LABELS: Record<TaskStatus, string> = {
 
 const TASK_STATUSES = Object.keys(STATUS_LABELS) as TaskStatus[]
 
+type StatusFilter = TaskStatus | 'all'
+
+const FILTERS: { value: StatusFilter; label: string }[] = [
+  { value: 'all', label: 'Todas' },
+  ...TASK_STATUSES.map((status) => ({
+    value: status,
+    label: STATUS_LABELS[status],
+  })),
+]
+
 // La fecha de vencimiento es un día sin hora: formatearla en la zona del
 // navegador podría moverla al día anterior.
 const dueDateFormatter = new Intl.DateTimeFormat('es-ES', {
@@ -63,6 +73,7 @@ export function TasksPage() {
   const [error, setError] = useState<string | null>(null)
   const [title, setTitle] = useState('')
   const [isUpdating, setIsUpdating] = useState(false)
+  const [filter, setFilter] = useState<StatusFilter>('all')
   const [pendingChange, setPendingChange] = useState<{
     holder: string
     apply: () => void
@@ -106,6 +117,8 @@ export function TasksPage() {
         const task = await createTask(token, title)
         setTasks((current) => [...(current ?? []), task])
         setTitle('')
+        // Con un filtro que no la muestra, parecería no haberse creado.
+        if (filter !== task.status) setFilter('all')
       } catch (cause) {
         closeExpiredSession(cause, logout)
         throw cause
@@ -158,6 +171,9 @@ export function TasksPage() {
   }
 
   const alertMessage = formError ?? error
+  const visibleTasks = (tasks ?? []).filter(
+    (task) => filter === 'all' || task.status === filter,
+  )
 
   return (
     <div className="bg-muted/40 min-h-svh p-6">
@@ -202,15 +218,37 @@ export function TasksPage() {
         )}
 
         {tasks && (
+          <div
+            role="group"
+            aria-label="Filtrar por estado"
+            className="flex flex-wrap gap-2"
+          >
+            {FILTERS.map(({ value, label }) => (
+              <Button
+                key={value}
+                variant={filter === value ? 'default' : 'outline'}
+                size="sm"
+                aria-pressed={filter === value}
+                onClick={() => setFilter(value)}
+              >
+                {label}
+              </Button>
+            ))}
+          </div>
+        )}
+
+        {tasks && (
           <Card>
             <CardContent>
-              {tasks.length === 0 && (
+              {visibleTasks.length === 0 && (
                 <p className="text-muted-foreground text-sm">
-                  Todavía no hay tareas.
+                  {tasks.length === 0
+                    ? 'Todavía no hay tareas.'
+                    : 'No hay tareas con este estado.'}
                 </p>
               )}
               <ul className="divide-y">
-                {tasks.map((task) => (
+                {visibleTasks.map((task) => (
                   <li
                     key={task.id}
                     className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 text-sm"
