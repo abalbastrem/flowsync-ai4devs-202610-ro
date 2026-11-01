@@ -9,7 +9,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ApiError, createTask, getTasks, takeTask } from '@/lib/api'
+import {
+  ApiError,
+  createTask,
+  getTasks,
+  takeTask,
+  updateTaskStatus,
+} from '@/lib/api'
 import type { Task, TaskStatus } from '@/lib/types'
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
@@ -17,6 +23,8 @@ const STATUS_LABELS: Record<TaskStatus, string> = {
   in_progress: 'En curso',
   done: 'Hecha',
 }
+
+const TASK_STATUSES = Object.keys(STATUS_LABELS) as TaskStatus[]
 
 // La fecha de vencimiento es un día sin hora: formatearla en la zona del
 // navegador podría moverla al día anterior.
@@ -26,6 +34,13 @@ const dueDateFormatter = new Intl.DateTimeFormat('es-ES', {
 })
 
 const FIELDS = ['title'] as const
+
+/** Una tarea hecha tampoco tiene responsable, pero no está disponible para nadie. */
+function assigneeLabel(task: Task) {
+  if (task.assignee) return task.assignee.fullName ?? task.assignee.initials
+
+  return task.status === 'done' ? '—' : 'Libre'
+}
 
 /** Con un token caducado no se puede hacer nada aquí: `ProtectedRoute` manda a /login. */
 function closeExpiredSession(cause: unknown, logout: () => Promise<void>) {
@@ -37,6 +52,7 @@ export function TasksPage() {
   const [tasks, setTasks] = useState<Task[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [title, setTitle] = useState('')
+  const [isUpdating, setIsUpdating] = useState(false)
   const { isSubmitting, formError, fieldErrors, submit, failWith } =
     useAuthForm(FIELDS)
 
@@ -83,14 +99,18 @@ export function TasksPage() {
     })
   }
 
-  const handleTake = async (id: number) => {
+  const updateTask = async (
+    id: number,
+    change: (token: string) => Promise<Task>,
+  ) => {
     if (!token) return
 
     setError(null)
+    setIsUpdating(true)
     try {
-      const taken = await takeTask(token, id)
+      const updated = await change(token)
       setTasks((current) =>
-        (current ?? []).map((task) => (task.id === id ? taken : task)),
+        (current ?? []).map((task) => (task.id === id ? updated : task)),
       )
     } catch (cause) {
       closeExpiredSession(cause, logout)
@@ -99,6 +119,8 @@ export function TasksPage() {
           ? cause.message
           : 'Algo ha ido mal. Inténtalo de nuevo.',
       )
+    } finally {
+      setIsUpdating(false)
     }
   }
 
@@ -164,11 +186,29 @@ export function TasksPage() {
                       {task.title}
                     </span>
                     <span className="text-muted-foreground">
-                      {task.assignee
-                        ? (task.assignee.fullName ?? task.assignee.initials)
-                        : 'Libre'}
+                      {assigneeLabel(task)}
                     </span>
-                    <span>{STATUS_LABELS[task.status]}</span>
+                    <select
+                      aria-label={`Estado de ${task.title}`}
+                      className="border-input bg-background h-8 rounded-md border px-2 text-sm disabled:opacity-50"
+                      value={task.status}
+                      disabled={isUpdating}
+                      onChange={(event) =>
+                        updateTask(task.id, (token) =>
+                          updateTaskStatus(
+                            token,
+                            task.id,
+                            event.target.value as TaskStatus,
+                          ),
+                        )
+                      }
+                    >
+                      {TASK_STATUSES.map((status) => (
+                        <option key={status} value={status}>
+                          {STATUS_LABELS[status]}
+                        </option>
+                      ))}
+                    </select>
                     {task.dueDate && (
                       <span className="text-muted-foreground">
                         {dueDateFormatter.format(new Date(task.dueDate))}
@@ -178,7 +218,12 @@ export function TasksPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleTake(task.id)}
+                        disabled={isUpdating}
+                        onClick={() =>
+                          updateTask(task.id, (token) =>
+                            takeTask(token, task.id),
+                          )
+                        }
                       >
                         Take
                       </Button>
