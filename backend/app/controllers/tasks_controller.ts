@@ -39,10 +39,11 @@ export default class TasksController {
   }
 
   async update({ auth, params, request, serialize }: HttpContext) {
-    const { title, status } = await request.validateUsing(updateTaskValidator)
+    const { title, status, dueDate } = await request.validateUsing(updateTaskValidator)
     const task = await Task.findOrFail(params.id)
 
     if (title !== undefined) task.title = title
+    if (dueDate !== undefined) task.dueDate = dueDate
     if (status !== undefined) task.changeStatus(status, auth.getUserOrFail())
     await task.save()
     await task.load('assignee')

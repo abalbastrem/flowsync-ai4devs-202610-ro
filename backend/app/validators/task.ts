@@ -23,4 +23,8 @@ export const createTaskValidator = vine.create({
 export const updateTaskValidator = vine.create({
   title: title().optional().requiredWhen(wasSent),
   status: vine.enum(TASK_STATUSES).optional().requiredWhen(wasSent),
+  dueDate: vine
+    .date({ formats: ['YYYY-MM-DD'] })
+    .nullable()
+    .optional(),
 })
