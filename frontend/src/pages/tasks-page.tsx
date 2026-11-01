@@ -27,8 +27,13 @@ const dueDateFormatter = new Intl.DateTimeFormat('es-ES', {
 
 const FIELDS = ['title'] as const
 
+/** Con un token caducado no se puede hacer nada aquí: `ProtectedRoute` manda a /login. */
+function closeExpiredSession(cause: unknown, logout: () => Promise<void>) {
+  if (cause instanceof ApiError && cause.status === 401) void logout()
+}
+
 export function TasksPage() {
-  const { token } = useAuth()
+  const { token, logout } = useAuth()
   const [tasks, setTasks] = useState<Task[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [title, setTitle] = useState('')
@@ -46,6 +51,7 @@ export function TasksPage() {
       })
       .catch((cause: unknown) => {
         if (isCurrent) {
+          closeExpiredSession(cause, logout)
           setError(
             cause instanceof ApiError
               ? cause.message
@@ -57,18 +63,23 @@ export function TasksPage() {
     return () => {
       isCurrent = false
     }
-  }, [token])
+  }, [token, logout])
 
   const handleCreate = (event: React.FormEvent) => {
     event.preventDefault()
 
+    if (!token) return
     if (!title.trim()) return failWith('title', 'Escribe un título.')
 
     return submit(async () => {
-      // `ProtectedRoute` garantiza que aquí ya hay sesión resuelta.
-      const task = await createTask(token!, title)
-      setTasks((current) => [...(current ?? []), task])
-      setTitle('')
+      try {
+        const task = await createTask(token, title)
+        setTasks((current) => [...(current ?? []), task])
+        setTitle('')
+      } catch (cause) {
+        closeExpiredSession(cause, logout)
+        throw cause
+      }
     })
   }
 
@@ -91,27 +102,39 @@ export function TasksPage() {
           </Alert>
         )}
 
-        <form onSubmit={handleCreate} className="grid gap-2" noValidate>
-          <Label htmlFor="title">Nueva tarea</Label>
-          <div className="flex gap-2">
-            <Input
-              id="title"
-              name="title"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              aria-invalid={Boolean(fieldErrors.title)}
-              aria-describedby={fieldErrors.title ? 'title-error' : undefined}
-            />
-            <Button type="submit" disabled={isSubmitting}>
-              Crear
-            </Button>
-          </div>
-          <FieldError id="title-error" message={fieldErrors.title} />
-        </form>
+        {!tasks && !error && (
+          <p className="text-muted-foreground text-sm">Cargando tareas…</p>
+        )}
+
+        {/* Sin la lista cargada, una tarea nueva parecería ser la única que hay. */}
+        {tasks && (
+          <form onSubmit={handleCreate} className="grid gap-2" noValidate>
+            <Label htmlFor="title">Nueva tarea</Label>
+            <div className="flex gap-2">
+              <Input
+                id="title"
+                name="title"
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                aria-invalid={Boolean(fieldErrors.title)}
+                aria-describedby={fieldErrors.title ? 'title-error' : undefined}
+              />
+              <Button type="submit" disabled={isSubmitting}>
+                Crear
+              </Button>
+            </div>
+            <FieldError id="title-error" message={fieldErrors.title} />
+          </form>
+        )}
 
         {tasks && (
           <Card>
             <CardContent>
+              {tasks.length === 0 && (
+                <p className="text-muted-foreground text-sm">
+                  Todavía no hay tareas.
+                </p>
+              )}
               <ul className="divide-y">
                 {tasks.map((task) => (
                   <li
