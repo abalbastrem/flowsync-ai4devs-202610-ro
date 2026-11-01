@@ -73,7 +73,7 @@ Flujo para cambiar el modelo de datos: crear migración → `node ace migration:
 - `.adonisjs/server/controllers.ts` — mapa de controladores. `start/routes.ts` los referencia vía `import { controllers } from '#generated/controllers'` y `[controllers.Profile, 'show']`, **no** con lazy imports de rutas.
 - `.adonisjs/client/registry/` — registro Tuyau (rutas + tipos de request/response) pensado para consumo tipado desde el frontend. `tests/bootstrap.ts` lo engancha al `apiClient` de Japa, así que en tests functional las rutas y sus payloads están tipados.
 
-Si tocas controladores o rutas y los tipos generados quedan obsoletos, arranca el dev server o corre los tests para regenerarlos, y commitea el diff.
+Si tocas controladores o rutas, arranca el dev server para regenerar los tipos y commitea el diff. Correr los tests no basta: regenera `controllers.ts`, pero no el registro de `.adonisjs/client/registry/` ni `.adonisjs/server/routes.d.ts`.
 
 ### Toda respuesta pasa por `serialize()`
 
@@ -99,6 +99,8 @@ Rutas actuales (`start/routes.ts`), todas bajo `/api/v1`:
 | POST | `/api/v1/auth/login` | `AccessTokensController.store` | no |
 | GET | `/api/v1/account/profile` | `ProfileController.show` | sí |
 | POST | `/api/v1/account/logout` | `AccessTokensController.destroy` | sí |
+| GET | `/api/v1/tasks` | `TasksController.index` | sí |
+| POST | `/api/v1/tasks` | `TasksController.store` | sí |
 
 ### Validación
 
