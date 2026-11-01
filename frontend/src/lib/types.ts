@@ -30,3 +30,27 @@ export type LoginPayload = {
   email: string
   password: string
 }
+
+/**
+ * Espejo de `AssigneeTransformer` del backend: el responsable viaja sin email.
+ */
+export type Assignee = {
+  id: number
+  fullName: string | null
+  initials: string
+}
+
+export type TaskStatus = 'pending' | 'in_progress' | 'done'
+
+/**
+ * Espejo de `TaskTransformer` del backend (app/transformers/task_transformer.ts).
+ */
+export type Task = {
+  id: number
+  title: string
+  status: TaskStatus
+  assignee: Assignee | null
+  dueDate: string | null
+  createdAt: string
+  updatedAt: string | null
+}
