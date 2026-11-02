@@ -14,8 +14,8 @@ export default defineConfig({
   reporter: isCI ? 'github' : 'list',
   use: {
     baseURL: `http://localhost:${APP_PORT}`,
-    // CI installs Chromium; on Windows, Edge is already there.
-    channel: isCI ? undefined : 'msedge',
+    // Windows already has Edge; elsewhere: npx playwright install chromium
+    channel: !isCI && process.platform === 'win32' ? 'msedge' : undefined,
     trace: 'retain-on-failure',
   },
   webServer: [
