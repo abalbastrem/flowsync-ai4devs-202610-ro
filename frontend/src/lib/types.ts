@@ -43,6 +43,19 @@ export type Assignee = {
 export type TaskStatus = 'pending' | 'in_progress' | 'done'
 
 /**
+ * Espejo de `TaskChangeTransformer` del backend.
+ */
+export type TaskChange = {
+  id: number
+  kind: 'created' | 'title' | 'taken' | 'status' | 'due_date' | 'deleted'
+  taskTitle: string
+  oldValue: string | null
+  newValue: string | null
+  actor: Assignee | null
+  createdAt: string
+}
+
+/**
  * Espejo de `TaskTransformer` del backend (app/transformers/task_transformer.ts).
  */
 export type Task = {

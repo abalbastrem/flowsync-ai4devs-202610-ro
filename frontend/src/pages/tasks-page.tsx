@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { AlertCircleIcon, PencilIcon, Trash2Icon } from 'lucide-react'
 import { useAuth } from '@/auth/use-auth'
 import { useAuthForm } from '@/auth/use-auth-form'
+import { ChangesSummary } from '@/components/changes-summary'
 import { FieldError } from '@/components/field-error'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
@@ -28,13 +29,9 @@ import {
   updateTaskStatus,
   updateTaskDetails,
 } from '@/lib/api'
-import type { Task, TaskStatus } from '@/lib/types'
-
-const STATUS_LABELS: Record<TaskStatus, string> = {
-  pending: 'Pendiente',
-  in_progress: 'En curso',
-  done: 'Hecha',
-}
+import { formatDueDate, STATUS_LABELS } from '@/lib/task-labels'
+import { visitChanges } from '@/lib/visit'
+import type { Task, TaskChange, TaskStatus } from '@/lib/types'
 
 const TASK_STATUSES = Object.keys(STATUS_LABELS) as TaskStatus[]
 
@@ -47,13 +44,6 @@ const FILTERS: { value: StatusFilter; label: string }[] = [
     label: STATUS_LABELS[status],
   })),
 ]
-
-// La fecha de vencimiento es un día sin hora: formatearla en la zona del
-// navegador podría moverla al día anterior.
-const dueDateFormatter = new Intl.DateTimeFormat('es-ES', {
-  dateStyle: 'medium',
-  timeZone: 'UTC',
-})
 
 const FIELDS = ['title'] as const
 
@@ -90,6 +80,7 @@ export function TasksPage() {
   const [title, setTitle] = useState('')
   const [isUpdating, setIsUpdating] = useState(false)
   const [isOutOfDate, setIsOutOfDate] = useState(false)
+  const [changes, setChanges] = useState<TaskChange[]>([])
   const [filter, setFilter] = useState<StatusFilter>('all')
   const [editing, setEditing] = useState<{
     id: number
@@ -169,6 +160,23 @@ export function TasksPage() {
       isCurrent = false
       clearTimeout(timer)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [token, logout])
+
+  useEffect(() => {
+    if (!token) return
+
+    let isCurrent = true
+    visitChanges(token)
+      .then((result) => {
+        if (isCurrent) setChanges(result)
+      })
+      .catch((cause: unknown) => {
+        if (isCurrent) closeExpiredSession(cause, logout)
+      })
+
+    return () => {
+      isCurrent = false
     }
   }, [token, logout])
 
@@ -336,6 +344,8 @@ export function TasksPage() {
             </AlertDescription>
           </Alert>
         )}
+
+        <ChangesSummary changes={changes} />
 
         {!tasks && !error && (
           <p className="text-muted-foreground text-sm">Cargando tareas…</p>
@@ -518,7 +528,7 @@ export function TasksPage() {
                             : 'text-muted-foreground'
                         }
                       >
-                        {dueDateFormatter.format(new Date(task.dueDate))}
+                        {formatDueDate(task.dueDate)}
                       </span>
                     )}
                     {isOverdue(task) && (

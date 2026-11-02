@@ -3,6 +3,7 @@ import type {
   LoginPayload,
   SignupPayload,
   Task,
+  TaskChange,
   TaskStatus,
   User,
 } from '@/lib/types'
@@ -175,6 +176,14 @@ export function logout(token: string): Promise<void> {
   return request('/api/v1/account/logout', { method: 'POST', token }).then(
     () => undefined,
   )
+}
+
+/** Empieza una visita y devuelve lo que otros han cambiado desde la anterior. */
+export function startVisit(token: string): Promise<TaskChange[]> {
+  return request<{ data: TaskChange[] }>('/api/v1/account/visits', {
+    method: 'POST',
+    token,
+  }).then((response) => response.data)
 }
 
 export function getTasks(token: string): Promise<Task[]> {

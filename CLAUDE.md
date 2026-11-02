@@ -101,6 +101,7 @@ Rutas actuales (`start/routes.ts`), todas bajo `/api/v1`:
 | POST | `/api/v1/auth/login` | `AccessTokensController.store` | no |
 | GET | `/api/v1/account/profile` | `ProfileController.show` | sí |
 | POST | `/api/v1/account/logout` | `AccessTokensController.destroy` | sí |
+| POST | `/api/v1/account/visits` | `VisitsController.store` | sí |
 | GET | `/api/v1/tasks` | `TasksController.index` | sí |
 | POST | `/api/v1/tasks` | `TasksController.store` | sí |
 | POST | `/api/v1/tasks/:id/take` | `TasksController.take` | sí |

@@ -29,6 +29,7 @@ router
       .group(() => {
         router.get('profile', [controllers.Profile, 'show'])
         router.post('logout', [controllers.AccessTokens, 'destroy'])
+        router.post('visits', [controllers.Visits, 'store'])
       })
       .prefix('account')
       .as('profile')
