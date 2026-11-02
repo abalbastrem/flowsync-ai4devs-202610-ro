@@ -89,6 +89,7 @@ export function TasksPage() {
   const [error, setError] = useState<string | null>(null)
   const [title, setTitle] = useState('')
   const [isUpdating, setIsUpdating] = useState(false)
+  const [isOutOfDate, setIsOutOfDate] = useState(false)
   const [filter, setFilter] = useState<StatusFilter>('all')
   const [editing, setEditing] = useState<{
     id: number
@@ -129,12 +130,15 @@ export function TasksPage() {
         if (version === changeVersion.current) setTasks(result)
         if (!hasLoaded) setError(null)
         hasLoaded = true
+        setIsOutOfDate(false)
       } catch (cause) {
         if (!isCurrent) return
 
         closeExpiredSession(cause, logout)
         // Con la lista ya cargada, se sigue viendo y la siguiente consulta lo reintenta.
-        if (!hasLoaded) {
+        if (hasLoaded) {
+          setIsOutOfDate(true)
+        } else {
           setError(
             cause instanceof ApiError
               ? cause.message
@@ -320,6 +324,16 @@ export function TasksPage() {
           <Alert variant="destructive">
             <AlertCircleIcon />
             <AlertDescription>{alertMessage}</AlertDescription>
+          </Alert>
+        )}
+
+        {isOutOfDate && (
+          <Alert>
+            <AlertCircleIcon />
+            <AlertDescription>
+              No se puede conectar con el servidor. La lista puede no estar al
+              día.
+            </AlertDescription>
           </Alert>
         )}
 
