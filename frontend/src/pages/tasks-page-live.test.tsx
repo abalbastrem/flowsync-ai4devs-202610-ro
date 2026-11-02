@@ -22,6 +22,8 @@ vi.mock('@/lib/api', async (importOriginal) => ({
 }))
 
 const POLL_MS = 3000
+const STALE_WARNING =
+  'No se puede conectar con el servidor. La lista puede no estar al día.'
 
 const task = (overrides: Partial<Task>): Task => ({
   id: 1,
@@ -297,6 +299,24 @@ describe('keeping the list up to date', () => {
     await nextPoll()
 
     expect(screen.getByText('New title')).toBeInTheDocument()
+  })
+
+  it('warns that the list may be out of date while refreshes fail', async () => {
+    vi.mocked(getTasks).mockResolvedValue([task({ title: 'A task' })])
+    renderList()
+    await screen.findByText('A task')
+    expect(screen.queryByText(STALE_WARNING)).not.toBeInTheDocument()
+
+    vi.mocked(getTasks).mockRejectedValue(new ApiError('Sin conexión.', 0))
+    await nextPoll()
+
+    expect(screen.getByText(STALE_WARNING)).toBeInTheDocument()
+    expect(screen.getByText('A task')).toBeInTheDocument()
+
+    vi.mocked(getTasks).mockResolvedValue([task({ title: 'A task' })])
+    await nextPoll()
+
+    expect(screen.queryByText(STALE_WARNING)).not.toBeInTheDocument()
   })
 
   it('recovers by itself if the first load failed', async () => {

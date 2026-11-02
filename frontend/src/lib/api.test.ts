@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { ApiError, deleteTask } from '@/lib/api'
+import { ApiError, deleteTask, getTasks } from '@/lib/api'
 
 const respondWith = (response: Response) => {
   const fetchMock = vi.fn().mockResolvedValue(response)
@@ -30,5 +30,38 @@ describe('deleteTask', () => {
 
     expect(error).toBeInstanceOf(ApiError)
     expect(error.status).toBe(404)
+  })
+})
+
+describe('getTasks', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
+  })
+
+  it('gives up on a request that never answers, so polling can carry on', async () => {
+    const controller = new AbortController()
+    const timeout = vi
+      .spyOn(AbortSignal, 'timeout')
+      .mockReturnValue(controller.signal)
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        (_url: string, options: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            options.signal?.addEventListener('abort', () =>
+              reject(new DOMException('Timed out', 'TimeoutError')),
+            )
+          }),
+      ),
+    )
+
+    const result = getTasks('a-token').catch((cause) => cause)
+    controller.abort()
+    const error = await result
+
+    expect(timeout).toHaveBeenCalledWith(10_000)
+    expect(error).toBeInstanceOf(ApiError)
+    expect(error.status).toBe(0)
   })
 })
