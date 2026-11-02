@@ -18,6 +18,7 @@ import type { Task } from '@/lib/types'
 vi.mock('@/lib/api', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/api')>()),
   getTasks: vi.fn(),
+  startVisit: vi.fn(() => Promise.resolve([])),
   createTask: vi.fn(),
   takeTask: vi.fn(),
   updateTaskStatus: vi.fn(),
