@@ -27,10 +27,10 @@ import {
   getTasks,
   takeTask,
   updateTaskStatus,
-  startVisit,
   updateTaskDetails,
 } from '@/lib/api'
 import { formatDueDate, STATUS_LABELS } from '@/lib/task-labels'
+import { visitChanges } from '@/lib/visit'
 import type { Task, TaskChange, TaskStatus } from '@/lib/types'
 
 const TASK_STATUSES = Object.keys(STATUS_LABELS) as TaskStatus[]
@@ -98,7 +98,6 @@ export function TasksPage() {
     useAuthForm(FIELDS)
   // Cambia con cada cambio propio: una consulta empezada antes está desfasada.
   const changeVersion = useRef(0)
-  const hasStartedVisit = useRef(false)
 
   useEffect(() => {
     // `ProtectedRoute` garantiza que aquí ya hay sesión resuelta.
@@ -165,14 +164,20 @@ export function TasksPage() {
   }, [token, logout])
 
   useEffect(() => {
-    // Empezar una visita consume sus cambios: en StrictMode, el segundo efecto
-    // recibiría una lista vacía y el resumen se perdería.
-    if (!token || hasStartedVisit.current) return
+    if (!token) return
 
-    hasStartedVisit.current = true
-    startVisit(token)
-      .then(setChanges)
-      .catch((cause: unknown) => closeExpiredSession(cause, logout))
+    let isCurrent = true
+    visitChanges(token)
+      .then((result) => {
+        if (isCurrent) setChanges(result)
+      })
+      .catch((cause: unknown) => {
+        if (isCurrent) closeExpiredSession(cause, logout)
+      })
+
+    return () => {
+      isCurrent = false
+    }
   }, [token, logout])
 
   useEffect(() => {
