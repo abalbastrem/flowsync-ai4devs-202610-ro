@@ -1,5 +1,12 @@
 import app from '@adonisjs/core/services/app'
+import env from '#start/env'
 import { defineConfig } from '@adonisjs/lucid'
+
+/**
+ * A file of its own for the end-to-end tests, so they never touch the
+ * development data.
+ */
+const separateFile = env.get('DB_FILE')
 
 const dbConfig = defineConfig({
   /**
@@ -15,7 +22,7 @@ const dbConfig = defineConfig({
       client: 'better-sqlite3',
 
       connection: {
-        filename: app.tmpPath(app.inTest ? 'test.sqlite3' : 'db.sqlite3'),
+        filename: app.tmpPath(separateFile ?? (app.inTest ? 'test.sqlite3' : 'db.sqlite3')),
       },
 
       /**
@@ -39,7 +46,7 @@ const dbConfig = defineConfig({
         /**
          * Enable schema generation from Lucid models.
          */
-        enabled: true,
+        enabled: !separateFile,
 
         /**
          * Custom schema rules file paths.

@@ -22,4 +22,4 @@ La Definition of Done exige TDD: cada criterio G/W/T acaba cubierto por un test,
 
 - `npm test` funciona en `backend/` y en `frontend/`.
 - La suite del backend solo pasa con la BD de tests migrada, y eso lo hace ella misma al arrancar.
-- Sin Playwright, nada comprueba la app completa de punta a punta hasta FLOW-15.
+- Sin Playwright, nada comprueba la app completa de punta a punta hasta FLOW-15. Desde entonces: `npm run test:e2e` en `frontend/`, con puertos y BD propios (`DB_FILE`).

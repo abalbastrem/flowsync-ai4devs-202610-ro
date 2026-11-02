@@ -14,5 +14,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
+    // The end-to-end tests run with Playwright: npm run test:e2e
+    exclude: ['e2e/**', 'node_modules/**'],
   },
 })
