@@ -10,7 +10,7 @@ import {
   getTasks,
   takeTask,
   updateTaskStatus,
-  updateTaskTitle,
+  updateTaskDetails,
 } from '@/lib/api'
 import { AppRoutes } from '@/routes/app-routes'
 import type { Task } from '@/lib/types'
@@ -21,7 +21,7 @@ vi.mock('@/lib/api', async (importOriginal) => ({
   createTask: vi.fn(),
   takeTask: vi.fn(),
   updateTaskStatus: vi.fn(),
-  updateTaskTitle: vi.fn(),
+  updateTaskDetails: vi.fn(),
   deleteTask: vi.fn(),
 }))
 
@@ -77,7 +77,7 @@ describe('task list page', () => {
         title: 'Fix login',
         status: 'in_progress',
         assignee: { id: 2, fullName: 'Ada Lovelace', initials: 'AL' },
-        dueDate: '2026-11-05T00:00:00.000+00:00',
+        dueDate: '2026-11-05',
       }),
     ])
 
@@ -549,7 +549,7 @@ describe('editing a task title', () => {
 
   beforeEach(() => {
     vi.mocked(getTasks).mockReset().mockResolvedValue([oldTask])
-    vi.mocked(updateTaskTitle).mockReset()
+    vi.mocked(updateTaskDetails).mockReset()
   })
 
   const startEditing = async () => {
@@ -565,7 +565,7 @@ describe('editing a task title', () => {
     screen.getByRole('textbox', { name: 'Título de Old title' })
 
   it('shows the new title after saving', async () => {
-    vi.mocked(updateTaskTitle).mockResolvedValue({
+    vi.mocked(updateTaskDetails).mockResolvedValue({
       ...oldTask,
       title: 'New title',
     })
@@ -581,11 +581,14 @@ describe('editing a task title', () => {
     expect(
       screen.queryByRole('button', { name: 'Guardar' }),
     ).not.toBeInTheDocument()
-    expect(updateTaskTitle).toHaveBeenCalledWith('a-token', 7, 'New title')
+    expect(updateTaskDetails).toHaveBeenCalledWith('a-token', 7, {
+      title: 'New title',
+      dueDate: null,
+    })
   })
 
   it('saves with Enter', async () => {
-    vi.mocked(updateTaskTitle).mockResolvedValue({
+    vi.mocked(updateTaskDetails).mockResolvedValue({
       ...oldTask,
       title: 'New title',
     })
@@ -608,7 +611,7 @@ describe('editing a task title', () => {
     await user.click(screen.getByRole('button', { name: 'Guardar' }))
 
     expect(await screen.findByText('Escribe un título.')).toBeInTheDocument()
-    expect(updateTaskTitle).not.toHaveBeenCalled()
+    expect(updateTaskDetails).not.toHaveBeenCalled()
     expect(titleField()).toBeInTheDocument()
   })
 
@@ -621,7 +624,7 @@ describe('editing a task title', () => {
 
     expect(screen.getByText('Old title')).toBeInTheDocument()
     expect(screen.queryByRole('textbox', { name: /Título/ })).toBeNull()
-    expect(updateTaskTitle).not.toHaveBeenCalled()
+    expect(updateTaskDetails).not.toHaveBeenCalled()
   })
 
   it('leaves the title as it was and sends nothing with Esc', async () => {
@@ -631,11 +634,11 @@ describe('editing a task title', () => {
 
     expect(screen.getByText('Old title')).toBeInTheDocument()
     expect(screen.queryByRole('textbox', { name: /Título/ })).toBeNull()
-    expect(updateTaskTitle).not.toHaveBeenCalled()
+    expect(updateTaskDetails).not.toHaveBeenCalled()
   })
 
   it('shows a server error and stays in edit mode, keeping the text', async () => {
-    vi.mocked(updateTaskTitle).mockRejectedValue(
+    vi.mocked(updateTaskDetails).mockRejectedValue(
       new ApiError('Sin conexión.', 0),
     )
     const user = await startEditing()
@@ -649,7 +652,9 @@ describe('editing a task title', () => {
   })
 
   it('closes the session if saving gets a 401', async () => {
-    vi.mocked(updateTaskTitle).mockRejectedValue(new ApiError('Caducada.', 401))
+    vi.mocked(updateTaskDetails).mockRejectedValue(
+      new ApiError('Caducada.', 401),
+    )
     const value = auth()
     const user = userEvent.setup()
 
@@ -669,7 +674,7 @@ describe('editing a task title', () => {
       assignee: { id: 2, fullName: 'Ada Lovelace', initials: 'AL' },
     }
     vi.mocked(getTasks).mockResolvedValue([adasTask])
-    vi.mocked(updateTaskTitle).mockResolvedValue({
+    vi.mocked(updateTaskDetails).mockResolvedValue({
       ...adasTask,
       title: 'New title',
     })
@@ -681,6 +686,138 @@ describe('editing a task title', () => {
     expect(await screen.findByText('New title')).toBeInTheDocument()
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
     expect(screen.getByText('Ada Lovelace')).toBeInTheDocument()
+  })
+})
+
+describe('setting a due date', () => {
+  const aTask = task({ id: 7, title: 'A task' })
+
+  const edit = async (dueDate: string | null) => {
+    vi.mocked(getTasks)
+      .mockReset()
+      .mockResolvedValue([{ ...aTask, dueDate }])
+    vi.mocked(updateTaskDetails).mockReset()
+    const user = userEvent.setup()
+    renderAt('/tasks')
+    await user.click(
+      await screen.findByRole('button', { name: 'Editar A task' }),
+    )
+    return user
+  }
+
+  const dateField = () => screen.getByLabelText('Vencimiento de A task')
+
+  it('shows the date after setting it', async () => {
+    const user = await edit(null)
+    vi.mocked(updateTaskDetails).mockResolvedValue({
+      ...aTask,
+      dueDate: '2999-12-25',
+    })
+
+    await user.type(dateField(), '2999-12-25')
+    await user.click(screen.getByRole('button', { name: 'Guardar' }))
+
+    expect(await screen.findByText('25 dic 2999')).toBeInTheDocument()
+    expect(updateTaskDetails).toHaveBeenCalledWith('a-token', 7, {
+      title: 'A task',
+      dueDate: '2999-12-25',
+    })
+  })
+
+  it('starts from the current date and shows the new one after changing it', async () => {
+    const user = await edit('2999-12-25')
+    vi.mocked(updateTaskDetails).mockResolvedValue({
+      ...aTask,
+      dueDate: '2999-12-31',
+    })
+
+    expect(dateField()).toHaveValue('2999-12-25')
+
+    await user.clear(dateField())
+    await user.type(dateField(), '2999-12-31')
+    await user.click(screen.getByRole('button', { name: 'Guardar' }))
+
+    expect(await screen.findByText('31 dic 2999')).toBeInTheDocument()
+    expect(screen.queryByText('25 dic 2999')).not.toBeInTheDocument()
+  })
+
+  it('shows no date after clearing it', async () => {
+    const user = await edit('2999-12-25')
+    vi.mocked(updateTaskDetails).mockResolvedValue({ ...aTask, dueDate: null })
+
+    await user.clear(dateField())
+    await user.click(screen.getByRole('button', { name: 'Guardar' }))
+
+    await waitFor(() =>
+      expect(screen.queryByText('25 dic 2999')).not.toBeInTheDocument(),
+    )
+    expect(screen.queryByLabelText('Vencimiento de A task')).toBeNull()
+    expect(updateTaskDetails).toHaveBeenCalledWith('a-token', 7, {
+      title: 'A task',
+      dueDate: null,
+    })
+  })
+
+  it('marks the task as overdue after saving a date in the past', async () => {
+    const user = await edit(null)
+    vi.mocked(updateTaskDetails).mockResolvedValue({
+      ...aTask,
+      dueDate: '2000-01-01',
+    })
+
+    await user.type(dateField(), '2000-01-01')
+    await user.click(screen.getByRole('button', { name: 'Guardar' }))
+
+    expect(await screen.findByText('Vencida')).toBeInTheDocument()
+    expect(screen.getByText('1 ene 2000')).toBeInTheDocument()
+  })
+})
+
+describe('overdue tasks', () => {
+  const localDay = (offset: number) => {
+    const day = new Date()
+    day.setDate(day.getDate() + offset)
+    const pad = (value: number) => String(value).padStart(2, '0')
+
+    return `${day.getFullYear()}-${pad(day.getMonth() + 1)}-${pad(day.getDate())}`
+  }
+
+  const show = async (overrides: Partial<Task>) => {
+    vi.mocked(getTasks)
+      .mockReset()
+      .mockResolvedValue([task({ title: 'A task', ...overrides })])
+    renderAt('/tasks')
+    await screen.findByText('A task')
+  }
+
+  it.each(['pending', 'in_progress'] as const)(
+    'marks a %s task with a past date',
+    async (status) => {
+      await show({ status, dueDate: localDay(-1) })
+
+      expect(screen.getByText('Vencida')).toBeInTheDocument()
+    },
+  )
+
+  it('does not mark a done task with a past date', async () => {
+    await show({ status: 'done', dueDate: localDay(-1) })
+
+    expect(screen.queryByText('Vencida')).not.toBeInTheDocument()
+  })
+
+  it.each([
+    ['today', 0],
+    ['tomorrow', 1],
+  ])('does not mark a task due %s', async (_, offset) => {
+    await show({ dueDate: localDay(offset) })
+
+    expect(screen.queryByText('Vencida')).not.toBeInTheDocument()
+  })
+
+  it('does not mark a task with no date', async () => {
+    await show({ dueDate: null })
+
+    expect(screen.queryByText('Vencida')).not.toBeInTheDocument()
   })
 })
 
@@ -770,7 +907,7 @@ describe('a task someone else has just deleted', () => {
     vi.mocked(getTasks).mockReset().mockResolvedValue([aTask])
     vi.mocked(takeTask).mockReset().mockRejectedValue(gone)
     vi.mocked(updateTaskStatus).mockReset().mockRejectedValue(gone)
-    vi.mocked(updateTaskTitle).mockReset().mockRejectedValue(gone)
+    vi.mocked(updateTaskDetails).mockReset().mockRejectedValue(gone)
     vi.mocked(deleteTask).mockReset().mockRejectedValue(gone)
   })
 
