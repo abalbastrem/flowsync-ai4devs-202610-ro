@@ -1,9 +1,11 @@
 import { StrictMode } from 'react'
 import { render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthContext, type AuthContextValue } from '@/auth/auth-context'
 import { ApiError, getTasks, startVisit } from '@/lib/api'
+import { forgetVisit } from '@/lib/visit'
 import { AppRoutes } from '@/routes/app-routes'
 import type { TaskChange } from '@/lib/types'
 
@@ -56,6 +58,7 @@ const renderList = (value = auth()) =>
 
 describe('summary of what changed since my last visit', () => {
   beforeEach(() => {
+    forgetVisit()
     vi.mocked(getTasks).mockReset().mockResolvedValue([])
     vi.mocked(startVisit).mockReset().mockResolvedValue([])
   })
@@ -185,6 +188,62 @@ describe('summary of what changed since my last visit', () => {
     ).toBeInTheDocument()
     expect(startVisit).toHaveBeenCalledTimes(1)
     expect(startVisit).toHaveBeenCalledWith('a-token')
+  })
+
+  it('going to the profile and back is the same visit, so the summary stays', async () => {
+    vi.mocked(startVisit)
+      .mockResolvedValueOnce([change({})])
+      .mockResolvedValue([])
+    const user = userEvent.setup()
+    renderList()
+    await screen.findByRole('region', { name: SUMMARY })
+
+    await user.click(screen.getByRole('link', { name: 'Perfil' }))
+    expect(screen.queryByRole('region', { name: SUMMARY })).toBeNull()
+    const links = screen.getAllByRole('link')
+    const backToTasks = links.find(
+      (link) => link.getAttribute('href') === '/tasks',
+    )
+    await user.click(backToTasks as HTMLElement)
+
+    expect(
+      await screen.findByRole('region', { name: SUMMARY }),
+    ).toBeInTheDocument()
+    expect(startVisit).toHaveBeenCalledTimes(1)
+  })
+
+  it('a new session is a new visit', async () => {
+    const { unmount } = renderList()
+    await waitFor(() => expect(startVisit).toHaveBeenCalledWith('a-token'))
+    unmount()
+
+    vi.mocked(startVisit).mockResolvedValue([change({})])
+    renderList({ ...auth(), token: 'another-token' })
+
+    expect(
+      await screen.findByRole('region', { name: SUMMARY }),
+    ).toBeInTheDocument()
+    expect(startVisit).toHaveBeenCalledTimes(2)
+    expect(startVisit).toHaveBeenLastCalledWith('another-token')
+  })
+
+  it('tries again on coming back if the visit failed', async () => {
+    vi.mocked(startVisit).mockRejectedValueOnce(new ApiError('Sin red.', 0))
+    const { unmount } = renderList()
+    await screen.findByText('Todavía no hay tareas.')
+    await waitFor(() => expect(startVisit).toHaveBeenCalledTimes(1))
+    await vi.waitFor(async () => {
+      await Promise.resolve()
+    })
+    unmount()
+
+    vi.mocked(startVisit).mockResolvedValue([change({})])
+    renderList()
+
+    expect(
+      await screen.findByRole('region', { name: SUMMARY }),
+    ).toBeInTheDocument()
+    expect(startVisit).toHaveBeenCalledTimes(2)
   })
 
   it('keeps the list working if the visit fails', async () => {
