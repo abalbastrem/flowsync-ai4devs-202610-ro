@@ -137,6 +137,20 @@ La URL de la API sale de `VITE_API_URL` (ver `frontend/.env.example`); por defec
 
 La lista de tareas se mantiene al día consultando la API cada 3 s; el porqué está en `docs/adr/0002-live-list-polling.md`.
 
+## Qué nivel de test escribir
+
+TDD dice cuándo escribir el test, no a qué nivel. Cada criterio G/W/T se prueba por defecto desde fuera, y solo se baja de nivel cuando compensa:
+
+| Nivel | Cuándo |
+|---|---|
+| **API** (backend, Japa): HTTP y BD reales | Por defecto en el backend |
+| **Componente** (frontend, Vitest y Testing Library): API simulada | Por defecto en el frontend |
+| **E2E** (Playwright): todo real | Pocos: recorridos críticos y lo que depende de que frontend y backend encajen |
+| **Unitario** | Solo cuando la lógica tiene demasiadas combinaciones para probarlas cómodamente por la API, o decisiones propias como reintentos o traducción de errores |
+
+- No escribas un test unitario de lógica simple (un `if` de dos ramas, propagar un error): repite el código, y la API ya lo cubre.
+- Simular un servicio externo y escribir un test unitario son decisiones distintas. Un servicio externo se simula siempre, porque no controlas cuándo falla, y su fallo se prueba por la API si la función no tiene lógica propia.
+
 ## Reglas de proceso
 - Una Story no está terminada hasta cumplir `docs/definition-of-done.md` (criterios G/W/T, TDD con el test en rojo antes que el código, y tamaño).
 - Antes de tocar código: crear una rama nueva (`git checkout -b feat/<slug>`). Nunca commitear directo en `main`/`s1/start`.
