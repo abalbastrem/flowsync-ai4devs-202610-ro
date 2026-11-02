@@ -53,6 +53,8 @@ npm run format    # prettier --write .
 
 Tests con Vitest y Testing Library (`src/**/*.test.tsx`). Configuración en `vite.config.ts` y `src/test/setup.ts`.
 
+Tests end to end con Playwright (`e2e/`): `npm run test:e2e` arranca backend y frontend en los puertos 3334 y 5174, con su propia BD (`DB_FILE=e2e.sqlite3`), sin tocar la de desarrollo. En Windows usa Edge; en CI, Chromium.
+
 ## Arquitectura del backend
 
 ### El esquema se genera, no se escribe
