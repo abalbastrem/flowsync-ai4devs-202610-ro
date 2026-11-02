@@ -16,9 +16,10 @@ export default defineConfig({
     baseURL: `http://localhost:${APP_PORT}`,
     trace: 'retain-on-failure',
   },
-  // NFR-6. Locally one browser is enough: on Windows, Edge is already there;
-  // elsewhere, npx playwright install chromium
-  projects: isCI
+  // NFR-6 is one pass before the test week, not every PR (see the Definition of
+  // Done): E2E_ALL_BROWSERS=1 runs it. Otherwise one browser: Edge on Windows,
+  // where it is already there, and Chromium elsewhere.
+  projects: process.env.E2E_ALL_BROWSERS
     ? [
         { name: 'chromium', use: { browserName: 'chromium' } },
         { name: 'firefox', use: { browserName: 'firefox' } },
@@ -26,10 +27,11 @@ export default defineConfig({
       ]
     : [
         {
-          name: 'local',
+          name: 'default',
           use: {
             browserName: 'chromium',
-            channel: process.platform === 'win32' ? 'msedge' : undefined,
+            channel:
+              !isCI && process.platform === 'win32' ? 'msedge' : undefined,
           },
         },
       ],
