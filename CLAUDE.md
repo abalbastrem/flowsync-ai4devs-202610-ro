@@ -132,6 +132,8 @@ Organización de `src/`:
 
 La URL de la API sale de `VITE_API_URL` (ver `frontend/.env.example`); por defecto `http://localhost:3333`.
 
+La lista de tareas se mantiene al día consultando la API cada 3 s; el porqué está en `docs/adr/0002-live-list-polling.md`.
+
 ## Reglas de proceso
 - Una Story no está terminada hasta cumplir `docs/definition-of-done.md` (criterios G/W/T, TDD con el test en rojo antes que el código, y tamaño).
 - Antes de tocar código: crear una rama nueva (`git checkout -b feat/<slug>`). Nunca commitear directo en `main`/`s1/start`.
