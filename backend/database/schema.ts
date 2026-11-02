@@ -43,6 +43,36 @@ export class AuthAccessTokenSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class TaskChangeSchema extends BaseModel {
+  static $columns = [
+    'actorId',
+    'createdAt',
+    'id',
+    'kind',
+    'newValue',
+    'oldValue',
+    'taskTitle',
+    'updatedAt',
+  ] as const
+  $columns = TaskChangeSchema.$columns
+  @column()
+  declare actorId: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare kind: string
+  @column()
+  declare newValue: string | null
+  @column()
+  declare oldValue: string | null
+  @column()
+  declare taskTitle: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class TaskSchema extends BaseModel {
   static $columns = [
     'assigneeId',
@@ -71,7 +101,15 @@ export class TaskSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'email',
+    'fullName',
+    'id',
+    'lastSeenChangeId',
+    'password',
+    'updatedAt',
+  ] as const
   $columns = UserSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -81,6 +119,8 @@ export class UserSchema extends BaseModel {
   declare fullName: string | null
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare lastSeenChangeId: number | null
   @column({ serializeAs: null })
   declare password: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })

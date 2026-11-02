@@ -8,6 +8,7 @@ export type ScannedRoutes = {
     'auth.access_tokens.store': { paramsTuple?: []; params?: {} }
     'profile.profile.show': { paramsTuple?: []; params?: {} }
     'profile.access_tokens.destroy': { paramsTuple?: []; params?: {} }
+    'profile.visits.store': { paramsTuple?: []; params?: {} }
     'tasks.tasks.index': { paramsTuple?: []; params?: {} }
     'tasks.tasks.store': { paramsTuple?: []; params?: {} }
     'tasks.tasks.take': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -26,6 +27,7 @@ export type ScannedRoutes = {
     'auth.new_account.store': { paramsTuple?: []; params?: {} }
     'auth.access_tokens.store': { paramsTuple?: []; params?: {} }
     'profile.access_tokens.destroy': { paramsTuple?: []; params?: {} }
+    'profile.visits.store': { paramsTuple?: []; params?: {} }
     'tasks.tasks.store': { paramsTuple?: []; params?: {} }
     'tasks.tasks.take': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }

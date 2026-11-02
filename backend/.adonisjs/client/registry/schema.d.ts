@@ -55,6 +55,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/access_tokens_controller').default['destroy']>>>
     }
   }
+  'profile.visits.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/visits'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/visits_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/visits_controller').default['store']>>>
+    }
+  }
   'tasks.tasks.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/tasks'
