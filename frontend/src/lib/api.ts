@@ -43,6 +43,7 @@ const FIELD_LABELS: Record<string, string> = {
   password: 'la contraseña',
   passwordConfirmation: 'la confirmación de la contraseña',
   title: 'el título',
+  dueDate: 'la fecha de vencimiento',
 }
 
 const label = (field?: string) => FIELD_LABELS[field ?? ''] ?? 'el campo'
@@ -200,14 +201,14 @@ export function deleteTask(token: string, id: number): Promise<void> {
   )
 }
 
-export function updateTaskTitle(
+export function updateTaskDetails(
   token: string,
   id: number,
-  title: string,
+  details: { title: string; dueDate: string | null },
 ): Promise<Task> {
   return request<{ data: Task }>(`/api/v1/tasks/${id}`, {
     method: 'PATCH',
-    body: { title },
+    body: details,
     token,
   }).then((response) => response.data)
 }

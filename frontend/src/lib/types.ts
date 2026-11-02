@@ -50,6 +50,7 @@ export type Task = {
   title: string
   status: TaskStatus
   assignee: Assignee | null
+  /** Un día sin hora: `YYYY-MM-DD`. */
   dueDate: string | null
   createdAt: string
   updatedAt: string | null
