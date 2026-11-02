@@ -26,7 +26,7 @@ import {
   getTasks,
   takeTask,
   updateTaskStatus,
-  updateTaskTitle,
+  updateTaskDetails,
 } from '@/lib/api'
 import type { Task, TaskStatus } from '@/lib/types'
 
@@ -64,6 +64,17 @@ function assigneeLabel(task: Task) {
   return task.status === 'done' ? '—' : 'Libre'
 }
 
+/** Hoy en la zona del navegador, en el mismo formato que `Task.dueDate`. */
+function localToday() {
+  const now = new Date()
+  const pad = (value: number) => String(value).padStart(2, '0')
+
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+}
+
+const isOverdue = (task: Task) =>
+  task.status !== 'done' && task.dueDate !== null && task.dueDate < localToday()
+
 /** Con un token caducado no se puede hacer nada aquí: `ProtectedRoute` manda a /login. */
 function closeExpiredSession(cause: unknown, logout: () => Promise<void>) {
   if (cause instanceof ApiError && cause.status === 401) void logout()
@@ -79,6 +90,7 @@ export function TasksPage() {
   const [editing, setEditing] = useState<{
     id: number
     title: string
+    dueDate: string
     error: string | null
   } | null>(null)
   const [pendingChange, setPendingChange] = useState<{
@@ -186,9 +198,12 @@ export function TasksPage() {
       return
     }
 
-    const { id, title: newTitle } = editing
+    const { id, title: newTitle, dueDate } = editing
     const saved = await updateTask(id, (token) =>
-      updateTaskTitle(token, id, newTitle),
+      updateTaskDetails(token, id, {
+        title: newTitle,
+        dueDate: dueDate || null,
+      }),
     )
     // Si falla, la fila sigue en edición para no perder lo escrito.
     if (saved) setEditing(null)
@@ -344,6 +359,18 @@ export function TasksPage() {
                               })
                             }
                           />
+                          <Input
+                            type="date"
+                            aria-label={`Vencimiento de ${task.title}`}
+                            className="h-8 w-auto"
+                            value={editing.dueDate}
+                            onChange={(event) =>
+                              setEditing({
+                                ...editing,
+                                dueDate: event.target.value,
+                              })
+                            }
+                          />
                           <Button type="submit" size="sm" disabled={isUpdating}>
                             Guardar
                           </Button>
@@ -375,6 +402,7 @@ export function TasksPage() {
                             setEditing({
                               id: task.id,
                               title: task.title,
+                              dueDate: task.dueDate ?? '',
                               error: null,
                             })
                           }
@@ -417,8 +445,19 @@ export function TasksPage() {
                       ))}
                     </select>
                     {task.dueDate && (
-                      <span className="text-muted-foreground">
+                      <span
+                        className={
+                          isOverdue(task)
+                            ? 'text-destructive font-medium'
+                            : 'text-muted-foreground'
+                        }
+                      >
                         {dueDateFormatter.format(new Date(task.dueDate))}
+                      </span>
+                    )}
+                    {isOverdue(task) && (
+                      <span className="text-destructive font-medium">
+                        Vencida
                       </span>
                     )}
                     {(task.status === 'pending' || isSomeoneElses(task)) && (
