@@ -14,10 +14,25 @@ export default defineConfig({
   reporter: isCI ? 'github' : 'list',
   use: {
     baseURL: `http://localhost:${APP_PORT}`,
-    // Windows already has Edge; elsewhere: npx playwright install chromium
-    channel: !isCI && process.platform === 'win32' ? 'msedge' : undefined,
     trace: 'retain-on-failure',
   },
+  // NFR-6. Locally one browser is enough: on Windows, Edge is already there;
+  // elsewhere, npx playwright install chromium
+  projects: isCI
+    ? [
+        { name: 'chromium', use: { browserName: 'chromium' } },
+        { name: 'firefox', use: { browserName: 'firefox' } },
+        { name: 'webkit', use: { browserName: 'webkit' } },
+      ]
+    : [
+        {
+          name: 'local',
+          use: {
+            browserName: 'chromium',
+            channel: process.platform === 'win32' ? 'msedge' : undefined,
+          },
+        },
+      ],
   webServer: [
     {
       command: 'node ace migration:fresh && node ace serve',
