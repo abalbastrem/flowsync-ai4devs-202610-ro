@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { AlertCircleIcon, PencilIcon, Trash2Icon } from 'lucide-react'
 import { useAuth } from '@/auth/use-auth'
@@ -57,6 +57,9 @@ const dueDateFormatter = new Intl.DateTimeFormat('es-ES', {
 
 const FIELDS = ['title'] as const
 
+/** Ver `docs/adr/0002-live-list-polling.md`. */
+const POLL_INTERVAL_MS = 3000
+
 /** Una tarea hecha tampoco tiene responsable, pero no está disponible para nadie. */
 function assigneeLabel(task: Task) {
   if (task.assignee) return task.assignee.fullName ?? task.assignee.initials
@@ -101,31 +104,76 @@ export function TasksPage() {
   } | null>(null)
   const { isSubmitting, formError, fieldErrors, submit, failWith } =
     useAuthForm(FIELDS)
+  // Cambia con cada cambio propio: una consulta empezada antes está desfasada.
+  const changeVersion = useRef(0)
 
   useEffect(() => {
     // `ProtectedRoute` garantiza que aquí ya hay sesión resuelta.
     if (!token) return
 
     let isCurrent = true
-    getTasks(token)
-      .then((result) => {
-        if (isCurrent) setTasks(result)
-      })
-      .catch((cause: unknown) => {
-        if (isCurrent) {
-          closeExpiredSession(cause, logout)
+    let hasLoaded = false
+    let isLoading = false
+    let timer: ReturnType<typeof setTimeout> | undefined
+
+    const load = async () => {
+      if (isLoading) return
+
+      isLoading = true
+      clearTimeout(timer)
+      const version = changeVersion.current
+      try {
+        const result = await getTasks(token)
+        if (!isCurrent) return
+
+        if (version === changeVersion.current) setTasks(result)
+        if (!hasLoaded) setError(null)
+        hasLoaded = true
+      } catch (cause) {
+        if (!isCurrent) return
+
+        closeExpiredSession(cause, logout)
+        // Con la lista ya cargada, se sigue viendo y la siguiente consulta lo reintenta.
+        if (!hasLoaded) {
           setError(
             cause instanceof ApiError
               ? cause.message
               : 'Algo ha ido mal. Inténtalo de nuevo.',
           )
         }
-      })
+      } finally {
+        isLoading = false
+      }
+
+      if (document.visibilityState === 'visible') {
+        timer = setTimeout(load, POLL_INTERVAL_MS)
+      }
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void load()
+      } else {
+        clearTimeout(timer)
+      }
+    }
+
+    void load()
+    document.addEventListener('visibilitychange', handleVisibilityChange)
 
     return () => {
       isCurrent = false
+      clearTimeout(timer)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [token, logout])
+
+  useEffect(() => {
+    if (editing && tasks && !tasks.some((task) => task.id === editing.id)) {
+      setEditing(null)
+      setError('Esta tarea ya no existe.')
+    }
+  }, [tasks, editing])
 
   const handleCreate = (event: React.FormEvent) => {
     event.preventDefault()
@@ -134,8 +182,10 @@ export function TasksPage() {
     if (!title.trim()) return failWith('title', 'Escribe un título.')
 
     return submit(async () => {
+      changeVersion.current += 1
       try {
         const task = await createTask(token, title)
+        changeVersion.current += 1
         setTasks((current) => [...(current ?? []), task])
         setTitle('')
         // Con un filtro que no la muestra, parecería no haberse creado.
@@ -159,8 +209,10 @@ export function TasksPage() {
 
     setError(null)
     setIsUpdating(true)
+    changeVersion.current += 1
     try {
       const updated = await change(token)
+      changeVersion.current += 1
       if (updated) {
         setTasks((current) =>
           (current ?? []).map((task) => (task.id === id ? updated : task)),
@@ -173,8 +225,8 @@ export function TasksPage() {
       closeExpiredSession(cause, logout)
       if (cause instanceof ApiError && cause.status === 404) {
         // Otra persona la ha borrado mientras seguía en esta pantalla.
+        changeVersion.current += 1
         removeFromList(id)
-        setEditing((current) => (current?.id === id ? null : current))
         setError('Esta tarea ya no existe.')
       } else {
         setError(
