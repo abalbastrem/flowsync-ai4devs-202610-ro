@@ -8,6 +8,7 @@ import type {
 } from '@/lib/types'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
+const TASKS_TIMEOUT_MS = 10_000
 
 /** Forma de cada error que devuelve el backend: `{ errors: [...] }`. */
 type BackendError = {
@@ -114,11 +115,12 @@ type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: unknown
   token?: string | null
+  signal?: AbortSignal
 }
 
 async function request<T>(
   path: string,
-  { method = 'GET', body, token }: RequestOptions = {},
+  { method = 'GET', body, token, signal }: RequestOptions = {},
 ): Promise<T> {
   const headers: Record<string, string> = { Accept: 'application/json' }
   if (body !== undefined) headers['Content-Type'] = 'application/json'
@@ -130,6 +132,7 @@ async function request<T>(
       method,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
+      signal,
     })
   } catch {
     throw new ApiError(
@@ -175,9 +178,11 @@ export function logout(token: string): Promise<void> {
 }
 
 export function getTasks(token: string): Promise<Task[]> {
-  return request<{ data: Task[] }>('/api/v1/tasks', { token }).then(
-    (response) => response.data,
-  )
+  // Una consulta sin respuesta no debe parar el refresco de la lista.
+  return request<{ data: Task[] }>('/api/v1/tasks', {
+    token,
+    signal: AbortSignal.timeout(TASKS_TIMEOUT_MS),
+  }).then((response) => response.data)
 }
 
 export function createTask(token: string, title: string): Promise<Task> {
