@@ -14,10 +14,27 @@ export default defineConfig({
   reporter: isCI ? 'github' : 'list',
   use: {
     baseURL: `http://localhost:${APP_PORT}`,
-    // Windows already has Edge; elsewhere: npx playwright install chromium
-    channel: !isCI && process.platform === 'win32' ? 'msedge' : undefined,
     trace: 'retain-on-failure',
   },
+  // NFR-6 is one pass before the test week, not every PR (see the Definition of
+  // Done): E2E_ALL_BROWSERS=1 runs it. Otherwise one browser: Edge on Windows,
+  // where it is already there, and Chromium elsewhere.
+  projects: process.env.E2E_ALL_BROWSERS
+    ? [
+        { name: 'chromium', use: { browserName: 'chromium' } },
+        { name: 'firefox', use: { browserName: 'firefox' } },
+        { name: 'webkit', use: { browserName: 'webkit' } },
+      ]
+    : [
+        {
+          name: 'default',
+          use: {
+            browserName: 'chromium',
+            channel:
+              !isCI && process.platform === 'win32' ? 'msedge' : undefined,
+          },
+        },
+      ],
   webServer: [
     {
       command: 'node ace migration:fresh && node ace serve',

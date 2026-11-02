@@ -53,7 +53,7 @@ npm run format    # prettier --write .
 
 Tests con Vitest y Testing Library (`src/**/*.test.tsx`). Configuración en `vite.config.ts` y `src/test/setup.ts`.
 
-Tests end to end con Playwright (`e2e/`): `npm run test:e2e` arranca backend y frontend en los puertos 3334 y 5174, con su propia BD (`DB_FILE=e2e.sqlite3`), sin tocar la de desarrollo. En Windows usa Edge; en CI y en otros sistemas, Chromium (`npx playwright install chromium`).
+Tests end to end con Playwright (`e2e/`): `npm run test:e2e` arranca backend y frontend en los puertos 3334 y 5174, con su propia BD (`DB_FILE=e2e.sqlite3`), sin tocar la de desarrollo. Usa un solo navegador: Edge en Windows y Chromium en CI y en otros sistemas (`npx playwright install chromium`). La pasada de NFR-6 se hace una vez, con `E2E_ALL_BROWSERS=1` (`npx playwright install firefox webkit`); WebKit no es Safari.
 
 ## Arquitectura del backend
 
