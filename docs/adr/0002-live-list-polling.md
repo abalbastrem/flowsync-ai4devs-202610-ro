@@ -32,7 +32,7 @@ Con 10 personas son unas 3,3 peticiones por segundo. La carga de la página tamb
 
 - Un cambio tarda hasta 3 s en verse, más lo que dure la petición: entra en los 5 s, con poco margen si la red es muy lenta.
 - Se hacen peticiones aunque no haya cambiado nada: unos 860 KB por minuto y persona con 200 tareas.
-- Durante esos segundos la lista puede estar desactualizada: alguien puede coger una tarea que otra persona acaba de coger, sin que le salga la confirmación de FR-3.
+- Durante esos segundos la lista puede estar desactualizada: alguien puede coger una tarea que otra persona acaba de coger, sin que le salga la confirmación de FR-3. Es un hueco aceptado a propósito en el MVP: que la API rechazara esos cambios con un `409` se dejó fuera en FLOW-10, a la espera de ver si hace falta una vez que la lista se refresque sola.
 
 ## Cuándo revisarla
 
