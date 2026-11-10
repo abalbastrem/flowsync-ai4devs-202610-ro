@@ -5,7 +5,10 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 export default class TasksController {
   async index({ serialize }: HttpContext) {
-    const tasks = await Task.query().preload('assignee')
+    const tasks = await Task.query()
+      .preload('assignee')
+      .orderBy('created_at', 'desc')
+      .orderBy('id', 'desc')
 
     return serialize(TaskTransformer.transform(tasks))
   }

@@ -51,7 +51,7 @@
 ## 9. Las tareas más recientes van primero (task-list)
 
 - [x] 9.1 Tests. API: con las tareas «A», «B» y «C» creadas en ese orden, la lista devuelve «C», «B», «A», y el orden se mantiene aunque coincidan los `created_at`. Componente: las filas se pintan en el orden que devuelve la API. Verificación: falla el orden.
-- [ ] 9.2 Implementación del `orderBy('created_at', 'desc').orderBy('id', 'desc')` en `index`. Verificación: los tests de 9.1 pasan.
+- [x] 9.2 Implementación del `orderBy('created_at', 'desc').orderBy('id', 'desc')` en `index`. Verificación: los tests de 9.1 pasan.
 
 ## 10. La tarea creada se ve sin recargar (tasks)
 
