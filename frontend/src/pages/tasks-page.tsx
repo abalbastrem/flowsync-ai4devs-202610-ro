@@ -97,7 +97,19 @@ export function TasksPage() {
           </Alert>
         )}
 
-        {tasks && (
+        {tasks?.length === 0 && (
+          <div className="bg-background rounded-md border border-dashed p-6 text-center">
+            <p className="font-medium">
+              Aquí verás en qué anda cada persona del equipo y qué queda libre.
+            </p>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Todavía no hay ninguna tarea: crea la primera escribiendo su
+              título arriba.
+            </p>
+          </div>
+        )}
+
+        {tasks && tasks.length > 0 && (
           <ul aria-label="Tareas" className="grid gap-2">
             {tasks.map((task) => (
               <TaskRow key={task.id} task={task} />

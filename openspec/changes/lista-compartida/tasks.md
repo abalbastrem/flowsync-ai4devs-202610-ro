@@ -66,7 +66,7 @@
 ## 12. La lista vacía explica qué es y ofrece crear la primera tarea (task-list)
 
 - [x] 12.1 Test de componente: si la API devuelve una lista vacía, se ve un texto explicativo y el formulario para crear la primera tarea, y no aparece una lista vacía sin más. Verificación: falla porque no hay estado vacío.
-- [ ] 12.2 Implementación del estado vacío en `TasksPage`. Verificación: el test de 12.1 pasa.
+- [x] 12.2 Implementación del estado vacío en `TasksPage`. Verificación: el test de 12.1 pasa.
 
 ## 13. Hay una sola lista de tareas (task-list)
 
