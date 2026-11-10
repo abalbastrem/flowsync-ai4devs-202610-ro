@@ -20,7 +20,15 @@ export const TOKEN = 'test-token'
  */
 export function renderWithSession(
   ui: React.ReactNode,
-  { user = ANA, route = '/' }: { user?: User | null; route?: string } = {},
+  {
+    user = ANA,
+    route = '/',
+    auth = {},
+  }: {
+    user?: User | null
+    route?: string
+    auth?: Partial<AuthContextValue>
+  } = {},
 ) {
   const value: AuthContextValue = {
     user,
@@ -30,6 +38,7 @@ export function renderWithSession(
     login: async () => undefined,
     signup: async () => undefined,
     logout: async () => undefined,
+    ...auth,
   }
 
   return render(
