@@ -159,13 +159,15 @@ test.group('Lista: consultarla no modifica nada', (group) => {
   test('varias consultas seguidas no cambian ninguna tarea', async ({ client, assert }) => {
     const { ana } = await seedTeam()
     await Task.create({ title: 'Hecha', assigneeId: ana.id, status: 'done' })
-    const snapshot = async () =>
-      (await Task.query().orderBy('id')).map((task) => ({
+    const snapshot = async () => {
+      const tasks = await Task.query().orderBy('id')
+      return tasks.map((task) => ({
         title: task.title,
         assigneeId: task.assigneeId,
         status: task.status,
         updatedAt: task.updatedAt?.toISO(),
       }))
+    }
     const before = await snapshot()
 
     for (let i = 0; i < 3; i++) {
