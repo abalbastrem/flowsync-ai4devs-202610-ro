@@ -149,3 +149,24 @@ describe('La lista no muestra fechas ni presencia', () => {
     ).not.toBeInTheDocument()
   })
 })
+
+describe('La lista vacía explica qué es y ofrece crear la primera tarea', () => {
+  it('sin tareas se ve un texto explicativo y el formulario, no una lista vacía', async () => {
+    serveTasks([])
+
+    renderWithSession(<TasksPage />)
+
+    expect(
+      await screen.findByText(
+        /aquí verás en qué anda cada persona del equipo/i,
+      ),
+    ).toBeInTheDocument()
+    expect(screen.getByText(/crea la primera tarea/i)).toBeInTheDocument()
+    expect(
+      screen.getByRole('form', { name: 'Nueva tarea' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('list', { name: 'Tareas' }),
+    ).not.toBeInTheDocument()
+  })
+})
