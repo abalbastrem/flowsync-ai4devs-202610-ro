@@ -103,7 +103,7 @@ export function TasksPage() {
               Aquí verás en qué anda cada persona del equipo y qué queda libre.
             </p>
             <p className="text-muted-foreground mt-1 text-sm">
-              Todavía no hay ninguna tarea: crea la primera escribiendo su
+              Todavía no hay ninguna: crea la primera tarea escribiendo su
               título arriba.
             </p>
           </div>
