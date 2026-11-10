@@ -113,3 +113,26 @@ test.group('Lista: el responsable se identifica por su nombre', (group) => {
     assert.notInclude(JSON.stringify(response.body()), 'example.com')
   })
 })
+
+test.group('Lista: las más recientes primero', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('las tareas creadas A, B y C se devuelven como C, B, A', async ({ client, assert }) => {
+    const ana = await User.create({
+      fullName: 'Ana García',
+      email: 'ana@example.com',
+      password: 'secret-password',
+    })
+    for (const title of ['A', 'B', 'C']) {
+      await Task.create({ title, assigneeId: ana.id, status: 'pending' })
+    }
+
+    const response = await client.get('/api/v1/tasks').loginAs(ana)
+
+    response.assertStatus(200)
+    assert.deepEqual(
+      response.body().data.map((task: { title: string }) => task.title),
+      ['C', 'B', 'A']
+    )
+  })
+})

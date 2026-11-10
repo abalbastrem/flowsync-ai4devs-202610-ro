@@ -109,3 +109,20 @@ describe('Solo existen tres estados fijos', () => {
     expect(labels).toEqual(['Pendiente', 'En curso', 'Hecho'])
   })
 })
+
+describe('Las tareas más recientes van primero', () => {
+  it('las filas se pintan en el orden que devuelve la API', async () => {
+    serveTasks([
+      aTask({ title: 'C' }),
+      aTask({ title: 'B' }),
+      aTask({ title: 'A' }),
+    ])
+
+    renderWithSession(<TasksPage />)
+
+    const titles = (await rows()).map(
+      (row) => row.firstElementChild?.textContent,
+    )
+    expect(titles).toEqual(['C', 'B', 'A'])
+  })
+})
