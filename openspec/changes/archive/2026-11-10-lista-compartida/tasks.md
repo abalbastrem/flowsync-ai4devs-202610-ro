@@ -80,7 +80,7 @@
 
 ## 15. Integración
 
-- [ ] 15.1 Recorrido manual con `make start`: registrar una persona con nombre y otra sin nombre, crear tareas con cada una y comprobar desde las dos sesiones que ven la misma lista, en el orden correcto, con nombre o iniciales y en «Pendiente». Verificación: el recorrido se cumple de principio a fin.
+- [x] 15.1 Recorrido manual con `make start`: registrar una persona con nombre y otra sin nombre, crear tareas con cada una y comprobar desde las dos sesiones que ven la misma lista, en el orden correcto, con nombre o iniciales y en «Pendiente». Verificación: el recorrido se cumple de principio a fin.
 - [x] 15.2 Comprobación final: `node ace test`, `npm run lint` y `npm run typecheck` en el backend; `npm test`, `npm run lint` y `npm run build` en el frontend. Verificación: todo en verde.
 
 ## Workflow follow-up
