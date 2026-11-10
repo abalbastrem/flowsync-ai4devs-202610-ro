@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AlertCircleIcon } from 'lucide-react'
 import { useAuth } from '@/auth/use-auth'
 import * as api from '@/lib/api'
@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import type { Task } from '@/lib/types'
 
 /**
  * La lista compartida del equipo: una sola vista, la misma para todos.
@@ -16,6 +17,30 @@ export function TasksPage() {
   const [title, setTitle] = useState('')
   const [isCreating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [tasks, setTasks] = useState<Task[] | null>(null)
+
+  useEffect(() => {
+    if (!token) return
+
+    let cancelled = false
+    api
+      .listTasks(token)
+      .then((loaded) => {
+        if (!cancelled) setTasks(loaded)
+      })
+      .catch((caught: unknown) => {
+        if (cancelled) return
+        setError(
+          caught instanceof ApiError
+            ? caught.message
+            : 'No se ha podido cargar la lista.',
+        )
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [token])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -67,6 +92,19 @@ export function TasksPage() {
             <AlertCircleIcon />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
+        )}
+
+        {tasks && (
+          <ul aria-label="Tareas" className="grid gap-2">
+            {tasks.map((task) => (
+              <li
+                key={task.id}
+                className="bg-background rounded-md border px-4 py-3"
+              >
+                {task.title}
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </main>

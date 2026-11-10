@@ -178,3 +178,9 @@ export function createTask(token: string, title: string): Promise<Task> {
     token,
   }).then((response) => response.data)
 }
+
+export function listTasks(token: string): Promise<Task[]> {
+  return request<{ data: Task[] }>('/api/v1/tasks', { token }).then(
+    (response) => response.data,
+  )
+}
