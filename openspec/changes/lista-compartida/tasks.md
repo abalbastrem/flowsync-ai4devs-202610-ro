@@ -35,13 +35,13 @@
 
 ## 6. La tarea nace con quien la crea como responsable (tasks)
 
-- [ ] 6.1 Tests. API: la tarea creada tiene como `assignee` al usuario autenticado, tanto en la respuesta del POST como en un GET posterior. Componente: después de crear, la fila muestra el nombre de quien ha iniciado sesión. Verificación: fallan si el servidor no asigna al autor.
-- [ ] 6.2 Implementación: el controlador `store` fija `assignee_id` con el usuario autenticado. Verificación: los tests de 6.1 pasan.
+- [x] 6.1 Tests. API: la tarea creada tiene como `assignee` al usuario autenticado, tanto en la respuesta del POST como en un GET posterior. Componente: después de crear, la fila muestra el nombre de quien ha iniciado sesión. Verificación: fallan si el servidor no asigna al autor.
+- [x] 6.2 Implementación: el controlador `store` fija `assignee_id` con el usuario autenticado. Verificación: los tests de 6.1 pasan.
 
 ## 7. La tarea nace en «Pendiente» (tasks)
 
-- [ ] 7.1 Tests. API: una tarea recién creada tiene `status = pending`. Componente: la fila nueva muestra «Pendiente». Verificación: fallan si no hay valor inicial.
-- [ ] 7.2 Implementación: el controlador `store` fija `status = pending`. Verificación: los tests de 7.1 pasan.
+- [x] 7.1 Tests. API: una tarea recién creada tiene `status = pending`. Componente: la fila nueva muestra «Pendiente». Verificación: fallan si no hay valor inicial.
+- [x] 7.2 Implementación: el controlador `store` fija `status = pending`. Verificación: los tests de 7.1 pasan.
 
 ## 8. Solo existen tres estados fijos (tasks)
 
