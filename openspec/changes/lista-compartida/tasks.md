@@ -15,7 +15,7 @@
 
 - [x] 2.1 Tests de API en `tests/functional/tasks/list.spec.ts`. Casos: dos usuarios distintos reciben exactamente el mismo conjunto de tareas; una tarea de la que es responsable otra persona aparece en la lista de cualquiera. Verificación: fallan porque `GET /api/v1/tasks` no existe.
 - [x] 2.2 Implementación del controlador `index` y de `GET /api/v1/tasks` (autenticado), con precarga del `assignee`. Verificación: los tests de 2.1 pasan.
-- [ ] 2.3 Tests de componente: la pantalla pinta todas las tareas que devuelve la API, sin filtrar por usuario. Verificación: fallan porque la pantalla todavía no carga la lista.
+- [x] 2.3 Tests de componente: la pantalla pinta todas las tareas que devuelve la API, sin filtrar por usuario. Verificación: fallan porque la pantalla todavía no carga la lista.
 - [ ] 2.4 Implementación de `listTasks` en `src/lib/api.ts` y de la carga de la lista en `TasksPage`. Verificación: los tests de 2.3 pasan.
 
 ## 3. La lista exige haber iniciado sesión (task-list)
