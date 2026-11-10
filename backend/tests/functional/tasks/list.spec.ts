@@ -51,3 +51,19 @@ test.group('Lista: la misma para todos los miembros', (group) => {
     assert.include(titles(response.body()), 'Tarea de Bruno')
   })
 })
+
+test.group('Lista: exige haber iniciado sesión', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('sin credenciales responde 401 y el cuerpo no contiene tareas', async ({
+    client,
+    assert,
+  }) => {
+    await seedTeam()
+
+    const response = await client.get('/api/v1/tasks')
+
+    response.assertStatus(401)
+    assert.notProperty(response.body(), 'data')
+  })
+})

@@ -20,8 +20,8 @@
 
 ## 3. La lista exige haber iniciado sesión (task-list)
 
-- [ ] 3.1 Tests. API: `GET /api/v1/tasks` sin credenciales responde 401 y el cuerpo no contiene tareas. Componente: sin sesión, al abrir `/` se llega a `/login` y no se ve ninguna tarea. Verificación: confirmar que los tests comprueban el caso de verdad. Si pasan ya de entrada porque el guard existe, hay que verificarlo rompiendo el guard un momento.
-- [ ] 3.2 Implementación, si hace falta, de lo que no cubran ya `middleware.auth()` y `ProtectedRoute`. Verificación: los tests de 3.1 pasan.
+- [x] 3.1 Tests. API: `GET /api/v1/tasks` sin credenciales responde 401 y el cuerpo no contiene tareas. Componente: sin sesión, al abrir `/` se llega a `/login` y no se ve ninguna tarea. Verificación: confirmar que los tests comprueban el caso de verdad. Si pasan ya de entrada porque el guard existe, hay que verificarlo rompiendo el guard un momento.
+- [x] 3.2 Implementación, si hace falta, de lo que no cubran ya `middleware.auth()` y `ProtectedRoute`. Verificación: los tests de 3.1 pasan.
 
 ## 4. Cada fila muestra título, responsable y estado (task-list)
 
