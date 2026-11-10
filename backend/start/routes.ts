@@ -36,6 +36,7 @@ router
 
     router
       .group(() => {
+        router.get('/', [controllers.Tasks, 'index'])
         router.post('/', [controllers.Tasks, 'store'])
       })
       .prefix('tasks')
