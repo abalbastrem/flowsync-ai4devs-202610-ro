@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AlertCircleIcon } from 'lucide-react'
 import { useAuth } from '@/auth/use-auth'
 import * as api from '@/lib/api'
@@ -14,48 +14,78 @@ import type { Task } from '@/lib/types'
  * La lista compartida del equipo: una sola vista, la misma para todos.
  */
 export function TasksPage() {
-  const { token } = useAuth()
+  const { token, logout } = useAuth()
   const [title, setTitle] = useState('')
   const [isCreating, setCreating] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [createError, setCreateError] = useState<string | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [tasks, setTasks] = useState<Task[] | null>(null)
+  // Solo cuenta la respuesta de la última carga pedida: una más antigua que
+  // llegue tarde no puede pisar una lista más reciente.
+  const latestLoad = useRef(0)
 
-  useEffect(() => {
+  // Un token que el backend ya no reconoce no sirve para nada: se cierra la
+  // sesión y `ProtectedRoute` lleva al inicio de sesión.
+  const isExpiredSession = useCallback(
+    (caught: unknown) => {
+      if (caught instanceof ApiError && caught.status === 401) {
+        void logout()
+        return true
+      }
+      return false
+    },
+    [logout],
+  )
+
+  const load = useCallback(() => {
     if (!token) return
 
-    let cancelled = false
+    const id = ++latestLoad.current
+    setLoadError(null)
     api
       .listTasks(token)
       .then((loaded) => {
-        if (!cancelled) setTasks(loaded)
+        if (id === latestLoad.current) setTasks(loaded)
       })
       .catch((caught: unknown) => {
-        if (cancelled) return
-        setError(
+        if (id !== latestLoad.current || isExpiredSession(caught)) return
+        setLoadError(
           caught instanceof ApiError
             ? caught.message
             : 'No se ha podido cargar la lista.',
         )
       })
+  }, [token, isExpiredSession])
 
+  useEffect(() => {
+    const loads = latestLoad
+    load()
     return () => {
-      cancelled = true
+      // Al desmontar o cambiar de token, ninguna carga en vuelo es la última.
+      loads.current++
     }
-  }, [token])
+  }, [load])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!token) return
 
     setCreating(true)
-    setError(null)
+    setCreateError(null)
     try {
       const created = await api.createTask(token, title)
-      // La más reciente va primero, igual que la ordena el servidor.
-      setTasks((current) => [created, ...(current ?? [])])
       setTitle('')
+      if (tasks === null) {
+        // La lista todavía no está (cargando o con error): insertar la nueva
+        // la haría pasar por la lista completa. Se vuelve a pedir entera.
+        load()
+      } else {
+        // La más reciente va primero, igual que la ordena el servidor.
+        setTasks((current) => [created, ...(current ?? [])])
+      }
     } catch (caught) {
-      setError(
+      if (isExpiredSession(caught)) return
+      setCreateError(
         caught instanceof ApiError
           ? caught.message
           : 'No se ha podido crear la tarea.',
@@ -90,11 +120,27 @@ export function TasksPage() {
           </Button>
         </form>
 
-        {error && (
+        {createError && (
           <Alert variant="destructive">
             <AlertCircleIcon />
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>{createError}</AlertDescription>
           </Alert>
+        )}
+
+        {loadError && (
+          <Alert variant="destructive">
+            <AlertCircleIcon />
+            <AlertDescription className="flex items-center justify-between gap-4">
+              {loadError}
+              <Button type="button" variant="outline" size="sm" onClick={load}>
+                Reintentar
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {tasks === null && !loadError && (
+          <p className="text-muted-foreground text-sm">Cargando la lista…</p>
         )}
 
         {tasks?.length === 0 && (
