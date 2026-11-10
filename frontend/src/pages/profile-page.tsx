@@ -28,7 +28,7 @@ export function ProfilePage() {
   }
 
   return (
-    <div className="bg-muted/40 flex min-h-svh items-center justify-center p-6">
+    <div className="bg-muted/40 flex min-h-[calc(100svh-3.5rem)] items-center justify-center p-6">
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex items-center gap-4">

@@ -66,7 +66,7 @@ export function TasksPage() {
   }
 
   return (
-    <main className="bg-muted/40 min-h-svh p-6">
+    <main className="bg-muted/40 min-h-[calc(100svh-3.5rem)] p-6">
       <div className="mx-auto grid w-full max-w-2xl gap-6">
         <h1 className="text-2xl font-semibold">Tareas del equipo</h1>
 
