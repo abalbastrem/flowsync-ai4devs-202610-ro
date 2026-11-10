@@ -45,8 +45,8 @@
 
 ## 8. Solo existen tres estados fijos (tasks)
 
-- [ ] 8.1 Test de componente: en la pantalla no hay ningún control para crear, renombrar o eliminar estados, y solo se muestran las etiquetas «Pendiente», «En curso» y «Hecho». Verificación: confirmar que el test falla si se añade un control o una etiqueta de más.
-- [ ] 8.2 Implementación: el conjunto de estados queda cerrado en un único sitio del backend y en otro del frontend. Verificación: el test de 8.1 pasa.
+- [x] 8.1 Test de componente: en la pantalla no hay ningún control para crear, renombrar o eliminar estados, y solo se muestran las etiquetas «Pendiente», «En curso» y «Hecho». Verificación: confirmar que el test falla si se añade un control o una etiqueta de más.
+- [x] 8.2 Implementación: el conjunto de estados queda cerrado en un único sitio del backend y en otro del frontend. Verificación: el test de 8.1 pasa.
 
 ## 9. Las tareas más recientes van primero (task-list)
 

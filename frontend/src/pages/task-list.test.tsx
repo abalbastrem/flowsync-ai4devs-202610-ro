@@ -77,3 +77,35 @@ describe('El responsable se identifica por su nombre', () => {
     expect(screen.queryByText(/@/)).not.toBeInTheDocument()
   })
 })
+
+describe('Solo existen tres estados fijos', () => {
+  it('no hay forma de crear, renombrar ni eliminar estados', async () => {
+    serveTasks([
+      aTask({ status: 'pending' }),
+      aTask({ status: 'in_progress' }),
+      aTask({ status: 'done' }),
+    ])
+
+    renderWithSession(<TasksPage />)
+    await rows()
+
+    const buttons = screen.getAllByRole('button').map((b) => b.textContent)
+    expect(buttons).toEqual(['Crear tarea'])
+    expect(screen.queryByText(/estado/i)).not.toBeInTheDocument()
+  })
+
+  it('las filas solo usan las etiquetas «Pendiente», «En curso» y «Hecho»', async () => {
+    serveTasks([
+      aTask({ status: 'pending' }),
+      aTask({ status: 'in_progress' }),
+      aTask({ status: 'done' }),
+    ])
+
+    renderWithSession(<TasksPage />)
+
+    const labels = (await rows()).map(
+      (row) => row.lastElementChild?.textContent,
+    )
+    expect(labels).toEqual(['Pendiente', 'En curso', 'Hecho'])
+  })
+})
