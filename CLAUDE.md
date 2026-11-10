@@ -26,7 +26,7 @@ npm run format                                  # prettier --write
 npm run typecheck                               # tsc --noEmit
 ```
 
-Tests (Japa). Dos suites declaradas en `adonisrc.ts`: `unit` (`tests/unit/**/*.spec.ts`, timeout 2s) y `functional` (`tests/functional/**/*.spec.ts`, timeout 30s). **Ninguno de los dos directorios existe todavía** — solo está `tests/bootstrap.ts`.
+Tests (Japa). Dos suites declaradas en `adonisrc.ts`: `unit` (`tests/unit/**/*.spec.ts`, timeout 2s) y `functional` (`tests/functional/**/*.spec.ts`, timeout 30s). Hoy solo existe `tests/functional/`.
 
 ```bash
 node ace test unit                    # una suite
@@ -48,9 +48,10 @@ npm run dev
 npm run build     # tsc -b && vite build (aquí se hace el typecheck)
 npm run lint      # oxlint (NO eslint)
 npm run format    # prettier --write .
+npm test          # vitest run
 ```
 
-No hay runner de tests instalado en el frontend.
+Tests de componente con Vitest, Testing Library y MSW (la API se simula a nivel de red): ver [ADR 0001](docs/adr/0001-stack-de-tests-frontend.md).
 
 ## Arquitectura del backend
 
@@ -113,7 +114,7 @@ El stack va deliberadamente en versiones muy recientes: **AdonisJS 7, Lucid 22, 
 
 ## Frontend
 
-El typecheck vive dentro de `npm run build`; el lint es **oxlint** (`.oxlintrc.json`), no eslint. El formateo es Prettier (`.prettierrc.json`: `semi: false`, `singleQuote: true`, para respetar el estilo ya existente); un hook `PostToolUse` en `.claude/settings.json` lo corre automáticamente sobre cada fichero de `frontend/` que Claude edite. No hay runner de tests instalado.
+El typecheck vive dentro de `npm run build`; el lint es **oxlint** (`.oxlintrc.json`), no eslint. El formateo es Prettier (`.prettierrc.json`: `semi: false`, `singleQuote: true`, para respetar el estilo ya existente); un hook `PostToolUse` en `.claude/settings.json` lo corre automáticamente sobre cada fichero de `frontend/` que Claude edite. Tests: `npm test` (Vitest), con el setup compartido en `src/test/` — [ADR 0001](docs/adr/0001-stack-de-tests-frontend.md).
 
 Stack: **Tailwind v4** (plugin de Vite, sin `tailwind.config.js`; los tokens viven en `src/index.css`), **shadcn/ui** (`components.json`, componentes generados en `src/components/ui/` — se traen con `npx shadcn@latest add <componente>` y no se editan a mano) y **react-router**. El alias `@/*` → `src/*` está declarado a la vez en `tsconfig.app.json` (sin `baseUrl`, deprecado en TS 6) y en `vite.config.ts`.
 
