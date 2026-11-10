@@ -70,7 +70,7 @@
 
 ## 13. Hay una sola lista de tareas (task-list)
 
-- [ ] 13.1 Test de componente: con sesión, la navegación no ofrece ninguna vista «mis tareas» ni otra lista, y `/` es la única vista de tareas. Verificación: confirmar que el test falla si se añade una segunda vista.
+- [x] 13.1 Test de componente: con sesión, la navegación no ofrece ninguna vista «mis tareas» ni otra lista, y `/` es la única vista de tareas. Verificación: confirmar que el test falla si se añade una segunda vista.
 - [ ] 13.2 Implementación, si hace falta, de un ajuste en la navegación (por ejemplo, el enlace entre la lista y el perfil). Verificación: el test de 13.1 pasa.
 
 ## 14. Consultar la lista no modifica nada (task-list)
