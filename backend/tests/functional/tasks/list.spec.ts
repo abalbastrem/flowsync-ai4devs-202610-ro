@@ -84,3 +84,32 @@ test.group('Lista: cada tarea trae título, responsable y estado', (group) => {
     }
   })
 })
+
+test.group('Lista: el responsable se identifica por su nombre', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('con un responsable sin nombre llegan sus iniciales, y nunca el email', async ({
+    client,
+    assert,
+  }) => {
+    const ana = await User.create({
+      fullName: 'Ana García',
+      email: 'ana@example.com',
+      password: 'secret-password',
+    })
+    const anonymous = await User.create({
+      fullName: null,
+      email: 'xavi.soler@example.com',
+      password: 'secret-password',
+    })
+    await Task.create({ title: 'Sin nombre', assigneeId: anonymous.id, status: 'pending' })
+
+    const response = await client.get('/api/v1/tasks').loginAs(ana)
+
+    response.assertStatus(200)
+    const [task] = response.body().data
+    assert.isNull(task.assignee.fullName)
+    assert.equal(task.assignee.initials, anonymous.initials)
+    assert.notInclude(JSON.stringify(response.body()), 'example.com')
+  })
+})

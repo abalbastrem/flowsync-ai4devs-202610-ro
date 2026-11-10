@@ -58,3 +58,22 @@ describe('Cada fila muestra título, responsable y estado', () => {
     expect(within(third).getByText('Hecho')).toBeInTheDocument()
   })
 })
+
+describe('El responsable se identifica por su nombre', () => {
+  it('con nombre se ve el nombre; sin nombre, las iniciales y nunca el email', async () => {
+    serveTasks([
+      aTask({ title: 'Con nombre' }),
+      aTask({
+        title: 'Sin nombre',
+        assignee: { id: 3, fullName: null, initials: 'XA' },
+      }),
+    ])
+
+    renderWithSession(<TasksPage />)
+
+    const [withName, withoutName] = await rows()
+    expect(within(withName).getByText('Ana García')).toBeInTheDocument()
+    expect(within(withoutName).getByText('XA')).toBeInTheDocument()
+    expect(screen.queryByText(/@/)).not.toBeInTheDocument()
+  })
+})
