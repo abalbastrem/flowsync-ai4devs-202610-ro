@@ -1,0 +1,24 @@
+schema: spec-driven
+
+context: |
+  Escribe todos los artefactos en castellano. Las palabras clave RFC 2119
+  (SHALL, MUST, MUST NOT) y las de escenario (GIVEN, WHEN, THEN, AND) van en inglés.
+  Un change corresponde a una historia de usuario. El PRD y el alcance viven en
+  docs/prd/ y las historias en docs/backlog/: se enlazan, no se reescriben.
+
+rules:
+  proposal:
+    - Solo decisiones de producto y el porqué, lo más breve posible. Los casos límite van a los escenarios de las specs.
+    - No añadas requisitos para protegerte del mal uso de la herramienta.
+    - Si el change sale de una historia de docs/backlog/, enlázala.
+  specs:
+    - Solo comportamiento observable desde fuera. En la API, la petición y la respuesta (estado HTTP y cuerpo). En el frontend, lo que una persona ve y puede hacer. Ni nombres de clases, ni de archivos, ni rutas de código.
+    - Cuando el escenario tiene precondición, escríbela como GIVEN antes del WHEN.
+  design:
+    - Si una decisión técnica es transversal (afecta a más de un change o a las dos capas), crea un ADR en docs/adr/ con el porqué, enlázalo desde design.md y añade una referencia corta en CLAUDE.md.
+  tasks:
+    - Por cada requisito, una pareja de tareas. Primero los tests, con al menos un caso por escenario (verificación - fallan por el motivo esperado). Después la implementación (verificación - los tests pasan).
+    - Los casos límite son escenarios de la spec. Si al escribir los tests aparece un caso que ningún escenario recoge, primero se añade el escenario a la spec y después se escribe su test.
+    - Cada tarea de test indica su nivel. API con HTTP y base de datos reales es el valor por defecto en backend. Componente con la API simulada es el valor por defecto en frontend. E2E solo para recorridos críticos o donde frontend y backend tengan que encajar. Unitario solo si la lógica tiene demasiadas combinaciones para probarla por la API, o decisiones propias como reintentos o traducción de errores.
+    - Los servicios externos se simulan siempre.
+    - La preparación técnica (por ejemplo, instalar un runner de tests en el frontend) es la primera tarea del grupo que la necesita, nunca un grupo aparte.
