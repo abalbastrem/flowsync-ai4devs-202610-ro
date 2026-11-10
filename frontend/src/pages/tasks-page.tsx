@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { TaskRow } from '@/components/task-row'
 import type { Task } from '@/lib/types'
 
 /**
@@ -97,12 +98,7 @@ export function TasksPage() {
         {tasks && (
           <ul aria-label="Tareas" className="grid gap-2">
             {tasks.map((task) => (
-              <li
-                key={task.id}
-                className="bg-background rounded-md border px-4 py-3"
-              >
-                {task.title}
-              </li>
+              <TaskRow key={task.id} task={task} />
             ))}
           </ul>
         )}
