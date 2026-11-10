@@ -136,3 +136,19 @@ test.group('Lista: las más recientes primero', (group) => {
     )
   })
 })
+
+test.group('Lista: sin fechas', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('las tareas de la respuesta no incluyen campos de fecha', async ({ client, assert }) => {
+    const { ana } = await seedTeam()
+
+    const response = await client.get('/api/v1/tasks').loginAs(ana)
+
+    response.assertStatus(200)
+    for (const task of response.body().data) {
+      for (const key of ['createdAt', 'updatedAt', 'dueDate']) assert.notProperty(task, key)
+      for (const key of ['createdAt', 'updatedAt', 'email']) assert.notProperty(task.assignee, key)
+    }
+  })
+})

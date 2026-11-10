@@ -60,8 +60,8 @@
 
 ## 11. La lista no muestra fechas ni presencia (task-list)
 
-- [ ] 11.1 Tests. API: las tareas de la respuesta no incluyen campos de fecha. Componente: ninguna fila muestra una fecha ni una marca de vencida, y la pantalla no muestra ningún indicador de presencia ni de actividad. Verificación: falla la API si el transformer expone timestamps.
-- [ ] 11.2 Implementación: ajustar el transformer y la fila hasta que pasen. Verificación: los tests de 11.1 pasan.
+- [x] 11.1 Tests. API: las tareas de la respuesta no incluyen campos de fecha. Componente: ninguna fila muestra una fecha ni una marca de vencida, y la pantalla no muestra ningún indicador de presencia ni de actividad. Verificación: falla la API si el transformer expone timestamps.
+- [x] 11.2 Implementación: ajustar el transformer y la fila hasta que pasen. Verificación: los tests de 11.1 pasan.
 
 ## 12. La lista vacía explica qué es y ofrece crear la primera tarea (task-list)
 

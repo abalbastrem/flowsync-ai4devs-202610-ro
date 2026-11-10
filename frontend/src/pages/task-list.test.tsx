@@ -126,3 +126,26 @@ describe('Las tareas más recientes van primero', () => {
     expect(titles).toEqual(['C', 'B', 'A'])
   })
 })
+
+describe('La lista no muestra fechas ni presencia', () => {
+  it('ninguna fila muestra una fecha ni una marca de vencida', async () => {
+    serveTasks([aTask(), aTask({ status: 'done' })])
+
+    renderWithSession(<TasksPage />)
+
+    for (const row of await rows()) {
+      expect(row.textContent).not.toMatch(/\d{1,2}[/-]\d{1,2}|\d{4}|vencid/i)
+    }
+  })
+
+  it('no hay señales de quién está en línea ni de actividad por persona', async () => {
+    serveTasks([aTask()])
+
+    renderWithSession(<TasksPage />)
+    await rows()
+
+    expect(
+      screen.queryByText(/en línea|conectad|online|activ|última vez|hace \d/i),
+    ).not.toBeInTheDocument()
+  })
+})
