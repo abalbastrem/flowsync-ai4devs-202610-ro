@@ -152,3 +152,27 @@ test.group('Lista: sin fechas', (group) => {
     }
   })
 })
+
+test.group('Lista: consultarla no modifica nada', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('varias consultas seguidas no cambian ninguna tarea', async ({ client, assert }) => {
+    const { ana } = await seedTeam()
+    await Task.create({ title: 'Hecha', assigneeId: ana.id, status: 'done' })
+    const snapshot = async () =>
+      (await Task.query().orderBy('id')).map((task) => ({
+        title: task.title,
+        assigneeId: task.assigneeId,
+        status: task.status,
+        updatedAt: task.updatedAt?.toISO(),
+      }))
+    const before = await snapshot()
+
+    for (let i = 0; i < 3; i++) {
+      const response = await client.get('/api/v1/tasks').loginAs(ana)
+      response.assertStatus(200)
+    }
+
+    assert.deepEqual(await snapshot(), before)
+  })
+})

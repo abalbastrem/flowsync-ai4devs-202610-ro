@@ -75,8 +75,8 @@
 
 ## 14. Consultar la lista no modifica nada (task-list)
 
-- [ ] 14.1 Test de API: con tareas en los tres estados, varias consultas seguidas no cambian el título, el responsable, el estado ni el `updated_at` de ninguna tarea. Verificación: confirmar que el test compara el estado de la base de datos antes y después.
-- [ ] 14.2 Implementación: ninguna, si `index` es de solo lectura. Verificación: el test de 14.1 pasa.
+- [x] 14.1 Test de API: con tareas en los tres estados, varias consultas seguidas no cambian el título, el responsable, el estado ni el `updated_at` de ninguna tarea. Verificación: confirmar que el test compara el estado de la base de datos antes y después.
+- [x] 14.2 Implementación: ninguna, si `index` es de solo lectura. Verificación: el test de 14.1 pasa.
 
 ## 15. Integración
 
