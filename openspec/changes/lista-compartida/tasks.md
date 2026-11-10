@@ -25,7 +25,7 @@
 
 ## 4. Cada fila muestra título, responsable y estado (task-list)
 
-- [ ] 4.1 Tests. API: cada tarea de la respuesta trae `title`, `status` y `assignee`. Componente: cada fila muestra el título, el responsable y el estado con su etiqueta («Pendiente», «En curso», «Hecho»), usando tareas simuladas en los tres estados. Verificación: fallan las etiquetas de estado.
+- [x] 4.1 Tests. API: cada tarea de la respuesta trae `title`, `status` y `assignee`. Componente: cada fila muestra el título, el responsable y el estado con su etiqueta («Pendiente», «En curso», «Hecho»), usando tareas simuladas en los tres estados. Verificación: fallan las etiquetas de estado.
 - [ ] 4.2 Implementación de la fila de la lista, con la traducción de `status` a su etiqueta. Verificación: los tests de 4.1 pasan.
 
 ## 5. El responsable se identifica por su nombre (task-list)

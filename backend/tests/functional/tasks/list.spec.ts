@@ -67,3 +67,20 @@ test.group('Lista: exige haber iniciado sesión', (group) => {
     assert.notProperty(response.body(), 'data')
   })
 })
+
+test.group('Lista: cada tarea trae título, responsable y estado', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('cada tarea del cuerpo incluye título, estado y responsable', async ({ client, assert }) => {
+    const { ana } = await seedTeam()
+
+    const response = await client.get('/api/v1/tasks').loginAs(ana)
+
+    response.assertStatus(200)
+    for (const task of response.body().data) {
+      assert.properties(task, ['title', 'status', 'assignee'])
+      assert.oneOf(task.status, ['pending', 'in_progress', 'done'])
+      assert.properties(task.assignee, ['fullName', 'initials'])
+    }
+  })
+})

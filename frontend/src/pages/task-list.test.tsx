@@ -34,3 +34,27 @@ describe('La lista es la misma para todos los miembros', () => {
     expect(screen.getByText('Tarea de Bruno')).toBeInTheDocument()
   })
 })
+
+describe('Cada fila muestra título, responsable y estado', () => {
+  it('muestra los tres datos, con el estado por su nombre', async () => {
+    serveTasks([
+      aTask({ title: 'Escribir el PRD', status: 'pending' }),
+      aTask({
+        title: 'Revisar el PR',
+        status: 'in_progress',
+        assignee: { id: 2, fullName: 'Bruno Díaz', initials: 'BD' },
+      }),
+      aTask({ title: 'Desplegar', status: 'done' }),
+    ])
+
+    renderWithSession(<TasksPage />)
+
+    const [first, second, third] = await rows()
+    expect(within(first).getByText('Escribir el PRD')).toBeInTheDocument()
+    expect(within(first).getByText('Ana García')).toBeInTheDocument()
+    expect(within(first).getByText('Pendiente')).toBeInTheDocument()
+    expect(within(second).getByText('Bruno Díaz')).toBeInTheDocument()
+    expect(within(second).getByText('En curso')).toBeInTheDocument()
+    expect(within(third).getByText('Hecho')).toBeInTheDocument()
+  })
+})
