@@ -41,7 +41,11 @@ describe('Crear una tarea con solo el título', () => {
               id: 1,
               title: 'Preparar la demo',
               status: 'pending',
-              assignee: { id: ANA.id, fullName: ANA.fullName, initials: ANA.initials },
+              assignee: {
+                id: ANA.id,
+                fullName: ANA.fullName,
+                initials: ANA.initials,
+              },
             },
           },
           { status: 201 },
@@ -51,7 +55,10 @@ describe('Crear una tarea con solo el título', () => {
 
     renderWithSession(<TasksPage />)
 
-    await userEvent.type(await screen.findByLabelText('Título'), 'Preparar la demo')
+    await userEvent.type(
+      await screen.findByLabelText('Título'),
+      'Preparar la demo',
+    )
     await userEvent.click(screen.getByRole('button', { name: 'Crear tarea' }))
 
     await expect.poll(() => body).toEqual({ title: 'Preparar la demo' })

@@ -20,10 +20,7 @@ export const TOKEN = 'test-token'
  */
 export function renderWithSession(
   ui: React.ReactNode,
-  {
-    user = ANA,
-    route = '/',
-  }: { user?: User | null; route?: string } = {},
+  { user = ANA, route = '/' }: { user?: User | null; route?: string } = {},
 ) {
   const value: AuthContextValue = {
     user,
