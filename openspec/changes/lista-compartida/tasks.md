@@ -31,7 +31,7 @@
 ## 5. El responsable se identifica por su nombre (task-list)
 
 - [x] 5.1 Tests. API: con un responsable sin nombre, `assignee.fullName` es null e `assignee.initials` existe; ninguna tarea incluye `email`. Componente: un responsable con nombre se ve como «Ana García»; uno sin nombre se ve por sus iniciales y su email no aparece en la pantalla. Verificación: falla el caso sin nombre.
-- [ ] 5.2 Implementación de `assignee.fullName ?? assignee.initials` en la fila. Verificación: los tests de 5.1 pasan.
+- [x] 5.2 Implementación de `assignee.fullName ?? assignee.initials` en la fila. Verificación: los tests de 5.1 pasan.
 
 ## 6. La tarea nace con quien la crea como responsable (tasks)
 
