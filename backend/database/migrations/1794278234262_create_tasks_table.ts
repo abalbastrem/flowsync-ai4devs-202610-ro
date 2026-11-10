@@ -7,10 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').notNullable()
       table.string('title').notNullable()
-      table
-        .enum('status', ['pending', 'in_progress', 'done'])
-        .notNullable()
-        .defaultTo('pending')
+      table.enum('status', ['pending', 'in_progress', 'done']).notNullable().defaultTo('pending')
       table
         .integer('assignee_id')
         .unsigned()
