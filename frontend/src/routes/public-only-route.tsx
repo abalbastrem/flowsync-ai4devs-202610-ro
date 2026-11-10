@@ -10,7 +10,7 @@ export function PublicOnlyRoute() {
   const { status } = useAuth()
 
   if (status === 'loading') return <FullScreenLoader />
-  if (status === 'authenticated') return <Navigate to="/profile" replace />
+  if (status === 'authenticated') return <Navigate to="/" replace />
 
   return <Outlet />
 }

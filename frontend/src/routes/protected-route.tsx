@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from 'react-router'
 import { useAuth } from '@/auth/use-auth'
 import { FullScreenLoader } from '@/components/full-screen-loader'
+import { MainNav } from '@/components/main-nav'
 
 /**
  * Deja pasar solo con sesión válida. Mientras se rehidrata el token guardado
@@ -12,5 +13,10 @@ export function ProtectedRoute() {
   if (status === 'loading') return <FullScreenLoader />
   if (status === 'anonymous') return <Navigate to="/login" replace />
 
-  return <Outlet />
+  return (
+    <>
+      <MainNav />
+      <Outlet />
+    </>
+  )
 }
