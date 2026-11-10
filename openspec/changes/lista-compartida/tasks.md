@@ -56,7 +56,7 @@
 ## 10. La tarea creada se ve sin recargar (tasks)
 
 - [x] 10.1 Test de componente: después de crear una tarea, aparece la primera de la lista sin una nueva petición GET (lo comprueba el handler de MSW). Verificación: falla si la pantalla vuelve a pedir la lista o no inserta la tarea.
-- [ ] 10.2 Implementación: insertar al principio del estado local la tarea devuelta por el POST. Verificación: el test de 10.1 pasa.
+- [x] 10.2 Implementación: insertar al principio del estado local la tarea devuelta por el POST. Verificación: el test de 10.1 pasa.
 
 ## 11. La lista no muestra fechas ni presencia (task-list)
 

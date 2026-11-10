@@ -50,7 +50,9 @@ export function TasksPage() {
     setCreating(true)
     setError(null)
     try {
-      await api.createTask(token, title)
+      const created = await api.createTask(token, title)
+      // La más reciente va primero, igual que la ordena el servidor.
+      setTasks((current) => [created, ...(current ?? [])])
       setTitle('')
     } catch (caught) {
       setError(
