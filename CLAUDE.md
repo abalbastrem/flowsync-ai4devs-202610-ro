@@ -53,6 +53,8 @@ npm test          # vitest run
 
 Tests de componente con Vitest, Testing Library y MSW (la API se simula a nivel de red): ver [ADR 0001](docs/adr/0001-stack-de-tests-frontend.md).
 
+Qué nivel de test toca en cada historia (endpoint como base, un E2E por historia con pantalla), la regla de «ningún test sin criterio» y la cobertura de ramas como detector: ver [ADR 0002](docs/adr/0002-niveles-de-test-y-cobertura.md).
+
 ## Arquitectura del backend
 
 ### El esquema se genera, no se escribe
