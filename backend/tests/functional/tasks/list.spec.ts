@@ -50,6 +50,25 @@ test.group('Lista: la misma para todos los miembros', (group) => {
     response.assertStatus(200)
     assert.include(titles(response.body()), 'Tarea de Bruno')
   })
+
+  test('SC-3 · alguien recién registrado, sin tareas propias, recibe la lista entera como los demás', async ({
+    client,
+    assert,
+  }) => {
+    const { ana } = await seedTeam()
+    const carla = await User.create({
+      fullName: 'Carla Ruiz',
+      email: 'carla@example.com',
+      password: 'secret-password',
+    })
+
+    const asCarla = await client.visit('tasks.tasks.index').loginAs(carla)
+    const asAna = await client.visit('tasks.tasks.index').loginAs(ana)
+
+    asCarla.assertStatus(200)
+    assert.deepEqual(titles(asCarla.body()), titles(asAna.body()))
+    assert.lengthOf(asCarla.body().data, 2)
+  })
 })
 
 test.group('Lista: exige haber iniciado sesión', (group) => {
