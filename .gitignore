@@ -27,3 +27,4 @@ coverage/
 
 # Matriz de trazabilidad: el estado de los tests no se versiona
 docs/trazabilidad/state.json
+docs/trazabilidad/specs-stamp.json

@@ -16,7 +16,7 @@ FRONTEND := frontend
 # La matriz de trazabilidad es una herramienta general que vive en el repo
 # claude-config del autor (tools/matrix/). Se puede sobrescribir: make matriz CLAUDE_CONFIG=...
 CLAUDE_CONFIG ?= $(HOME)/projects/software/claude-config
-MATRIZ := node $(CLAUDE_CONFIG)/tools/matrix
+MATRIZ := node "$(CLAUDE_CONFIG)/tools/matrix"
 MATRIZ_DIR := docs/trazabilidad
 
 .DEFAULT_GOAL := help
@@ -130,6 +130,7 @@ start: ## Levanta backend y frontend a la vez
 test: ## Ejecuta todos los tests y guarda sus resultados
 	@set -o pipefail; fallo=0; \
 	mkdir -p $(BACKEND)/tmp $(FRONTEND)/tmp; \
+	$(MATRIZ)/matrix.ts --dir $(MATRIZ_DIR) --stamp; \
 	echo "==> Tests del backend"; \
 	( cd $(BACKEND) && npx c8 node ace test --reporters=spec --reporters=ndjson | tee tmp/resultados-tests.ndjson | grep -v '^{' ) || fallo=1; \
 	echo "==> Tests del frontend"; \
