@@ -64,7 +64,9 @@ make matriz-check   # falla si hay tests sin escenario, escenarios sin test, en 
 make matriz-viva    # vista en http://localhost:5180 que se repinta sola con cada make test
 ```
 
-El hook `.githooks/pre-push` (lo activa `make setup`) corre `make test` y `make matriz-check`, y bloquea el push si la matriz no está en verde.
+El hook `.githooks/pre-push` (lo activa `make setup`, o `make hooks` en un clon ya montado) corre `make typecheck`, `make test` (backend, frontend y E2E con Playwright) y `make matriz-check`, y bloquea el push si hay errores de tipos o la matriz no está en verde.
+
+Los E2E (`frontend/e2e/`, `npm run test:e2e`) levantan su propio backend (puerto 3334, `DB_FILE=e2e.sqlite3`) y su propio Vite (5174): no tocan los datos de desarrollo.
 
 ## Arquitectura del backend
 

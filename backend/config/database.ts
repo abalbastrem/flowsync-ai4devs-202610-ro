@@ -7,6 +7,10 @@ import { defineConfig } from '@adonisjs/lucid'
  * the development data.
  */
 const separateFile = env.get('DB_FILE')
+if (separateFile && !/^[\w.-]+\.sqlite3$/.test(separateFile)) {
+  // A path here could point migration:fresh at data that is not the E2E's.
+  throw new Error(`DB_FILE must be a file name in tmp/ ending in .sqlite3, got: ${separateFile}`)
+}
 
 const dbConfig = defineConfig({
   /**
