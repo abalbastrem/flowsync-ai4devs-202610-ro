@@ -13,8 +13,14 @@ SHELL := /bin/bash
 BACKEND  := backend
 FRONTEND := frontend
 
+# La matriz de trazabilidad es una herramienta general que vive en el repo
+# claude-config del autor (tools/matrix/). Se puede sobrescribir: make matriz CLAUDE_CONFIG=...
+CLAUDE_CONFIG ?= $(HOME)/projects/software/claude-config
+MATRIZ := node $(CLAUDE_CONFIG)/tools/matrix
+MATRIZ_DIR := docs/trazabilidad
+
 .DEFAULT_GOAL := help
-.PHONY: help setup start install env migrate clean
+.PHONY: help setup start install env migrate hooks clean test matriz matriz-check matriz-viva
 
 # La ayuda se genera a partir de los comentarios `## ...` de cada target, para
 # que no haya un segundo listado que mantener a mano y que pueda divergir.
@@ -22,47 +28,53 @@ help: ## Muestra esta ayuda
 	@echo "FlowSync — targets disponibles:"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) \
-		| awk 'BEGIN { FS = ":.*## " }; { printf "  make %-8s %s\n", $$1, $$2 }'
+		| awk 'BEGIN { FS = ":.*## " }; { printf "  make %-13s %s\n", $$1, $$2 }'
 	@echo ""
 
 # ---------------------------------------------------------------------------
 # setup
 # ---------------------------------------------------------------------------
 
-setup: install env migrate ## Deja el proyecto listo para arrancar
+setup: install env migrate hooks ## Deja el proyecto listo para arrancar
 	@echo ""
-	@echo "✅ Setup completado. Arranca todo con: make start"
+	@echo "OK: Setup completado. Arranca todo con: make start"
+
+# El hook pre-push bloquea el push si la matriz de trazabilidad no está en verde
+# (ver la sección «Traceability matrix» del README de claude-config).
+hooks:
+	@git config core.hooksPath .githooks
+	@echo "==> Hooks de git activados (.githooks/)."
 
 install:
-	@command -v node >/dev/null 2>&1 || { echo "❌ Node.js no está instalado."; exit 1; }
-	@command -v npm  >/dev/null 2>&1 || { echo "❌ npm no está instalado."; exit 1; }
-	@echo "📦 Instalando dependencias del backend..."
+	@command -v node >/dev/null 2>&1 || { echo "ERROR: Node.js no está instalado."; exit 1; }
+	@command -v npm  >/dev/null 2>&1 || { echo "ERROR: npm no está instalado."; exit 1; }
+	@echo "==> Instalando dependencias del backend..."
 	@cd $(BACKEND) && npm install
-	@echo "📦 Instalando dependencias del frontend..."
+	@echo "==> Instalando dependencias del frontend..."
 	@cd $(FRONTEND) && npm install
 
 env:
 	@if [ ! -f $(BACKEND)/.env ]; then \
-		echo "📝 Creando $(BACKEND)/.env desde .env.example..."; \
+		echo "==> Creando $(BACKEND)/.env desde .env.example..."; \
 		cp $(BACKEND)/.env.example $(BACKEND)/.env; \
 	else \
-		echo "📝 $(BACKEND)/.env ya existe, no se toca."; \
+		echo "==> $(BACKEND)/.env ya existe, no se toca."; \
 	fi
 	@if [ ! -f $(FRONTEND)/.env ]; then \
-		echo "📝 Creando $(FRONTEND)/.env desde .env.example..."; \
+		echo "==> Creando $(FRONTEND)/.env desde .env.example..."; \
 		cp $(FRONTEND)/.env.example $(FRONTEND)/.env; \
 	else \
-		echo "📝 $(FRONTEND)/.env ya existe, no se toca."; \
+		echo "==> $(FRONTEND)/.env ya existe, no se toca."; \
 	fi
 	@if grep -Eq '^APP_KEY=.+' $(BACKEND)/.env; then \
-		echo "🔑 APP_KEY ya definida, no se regenera."; \
+		echo "==> APP_KEY ya definida, no se regenera."; \
 	else \
-		echo "🔑 Generando APP_KEY..."; \
+		echo "==> Generando APP_KEY..."; \
 		cd $(BACKEND) && node ace generate:key; \
 	fi
 
 migrate:
-	@echo "🗃️  Ejecutando migraciones..."
+	@echo "==> Ejecutando migraciones..."
 	@cd $(BACKEND) && node ace migration:run
 
 # ---------------------------------------------------------------------------
@@ -93,27 +105,52 @@ migrate:
 # provocaría un SIGTTIN, colgando el "Press h" de Adonis y los atajos de Vite.
 start: ## Levanta backend y frontend a la vez
 	@if [ ! -d $(BACKEND)/node_modules ] || [ ! -d $(FRONTEND)/node_modules ]; then \
-		echo "❌ Faltan dependencias. Ejecuta primero: make setup"; exit 1; \
+		echo "ERROR: Faltan dependencias. Ejecuta primero: make setup"; exit 1; \
 	fi
 	@if [ ! -f $(BACKEND)/.env ]; then \
-		echo "❌ Falta $(BACKEND)/.env. Ejecuta primero: make setup"; exit 1; \
+		echo "ERROR: Falta $(BACKEND)/.env. Ejecuta primero: make setup"; exit 1; \
 	fi
-	@echo "🚀 Arrancando backend (http://localhost:3333) y frontend (http://localhost:5173)..."
+	@echo "==> Arrancando backend (http://localhost:3333) y frontend (http://localhost:5173)..."
 	@echo "   Ctrl-C para parar los dos. Si uno se cae, el otro se cierra también."
 	@echo ""
 	@trap 'trap - INT TERM EXIT; kill -INT 0' INT TERM EXIT; \
 	( cd $(BACKEND)  && npm run dev; \
-	  echo ""; echo "⚠️  El backend se ha parado. Cerrando el frontend."; kill -INT 0 ) & \
+	  echo ""; echo "AVISO: El backend se ha parado. Cerrando el frontend."; kill -INT 0 ) & \
 	( cd $(FRONTEND) && npm run dev; \
-	  echo ""; echo "⚠️  El frontend se ha parado. Cerrando el backend."; kill -INT 0 ) & \
+	  echo ""; echo "AVISO: El frontend se ha parado. Cerrando el backend."; kill -INT 0 ) & \
 	wait
+
+# ---------------------------------------------------------------------------
+# tests y matriz de trazabilidad (claude-config/tools/matrix)
+# ---------------------------------------------------------------------------
+
+# Corre backend y frontend aunque uno falle, para que la matriz tenga todos los
+# resultados, y sale con error si alguna ha fallado. Cada runner deja sus
+# resultados en su tmp/, que es de donde los lee la matriz.
+test: ## Ejecuta todos los tests y guarda sus resultados
+	@set -o pipefail; fallo=0; \
+	mkdir -p $(BACKEND)/tmp $(FRONTEND)/tmp; \
+	echo "==> Tests del backend"; \
+	( cd $(BACKEND) && npx c8 node ace test --reporters=spec --reporters=ndjson | tee tmp/resultados-tests.ndjson | grep -v '^{' ) || fallo=1; \
+	echo "==> Tests del frontend"; \
+	( cd $(FRONTEND) && npx vitest run --coverage --reporter=default --reporter=json --outputFile.json=tmp/resultados-tests.json ) || fallo=1; \
+	exit $$fallo
+
+matriz: ## Regenera la matriz de trazabilidad con los últimos resultados
+	@$(MATRIZ)/matrix.ts --dir $(MATRIZ_DIR)
+
+matriz-check: ## Falla si la matriz tiene huecos, rojos o está desfasada
+	@$(MATRIZ)/matrix.ts --dir $(MATRIZ_DIR) --check
+
+matriz-viva: ## Abre la matriz en el navegador y la repinta con cada ejecución
+	@$(MATRIZ)/server.ts --dir $(MATRIZ_DIR)
 
 # ---------------------------------------------------------------------------
 # clean
 # ---------------------------------------------------------------------------
 
 clean: ## Borra node_modules y la base de datos SQLite
-	@echo "🧹 Limpiando..."
+	@echo "==> Limpiando..."
 	@rm -rf $(BACKEND)/node_modules $(FRONTEND)/node_modules
 	@rm -f $(BACKEND)/tmp/db.sqlite3 $(BACKEND)/tmp/db.sqlite3-wal $(BACKEND)/tmp/db.sqlite3-shm
-	@echo "✅ Listo. Vuelve a ejecutar: make setup"
+	@echo "OK: Listo. Vuelve a ejecutar: make setup"

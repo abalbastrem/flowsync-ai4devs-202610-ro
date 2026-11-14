@@ -24,3 +24,6 @@ coverage/
 .DS_Store
 .vscode/
 .idea/
+
+# Matriz de trazabilidad: el estado de los tests no se versiona
+docs/trazabilidad/state.json

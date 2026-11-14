@@ -53,6 +53,19 @@ npm test          # vitest run
 
 Tests de componente con Vitest, Testing Library y MSW (la API se simula a nivel de red): ver [ADR 0001](docs/adr/0001-stack-de-tests-frontend.md).
 
+### Matriz de trazabilidad
+
+Cada escenario de OpenSpec lleva un ID `[SC-n]` único en todo el repo, y el título de cada test empieza por el ID del escenario que prueba. La matriz que los cruza es una herramienta general del repo `claude-config` del autor (`tools/matrix/`, ruta en `CLAUDE_CONFIG` del `Makefile`); aquí solo vive su configuración, `docs/trazabilidad/config.json`, y la matriz generada, `docs/trazabilidad/matrix.md`.
+
+```bash
+make test           # backend y frontend, con resultados y cobertura de ramas para la matriz
+make matriz         # regenera docs/trazabilidad/matrix.md
+make matriz-check   # falla si hay tests sin escenario, escenarios sin test, en rojo u omitidos
+make matriz-viva    # vista en http://localhost:5180 que se repinta sola con cada make test
+```
+
+El hook `.githooks/pre-push` (lo activa `make setup`) corre `make test` y `make matriz-check`, y bloquea el push si la matriz no está en verde.
+
 ## Arquitectura del backend
 
 ### El esquema se genera, no se escribe

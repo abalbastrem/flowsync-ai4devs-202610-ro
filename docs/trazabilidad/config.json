@@ -1,0 +1,11 @@
+{
+  "results": [
+    { "runner": "japa", "file": "backend/tmp/resultados-tests.ndjson", "root": "backend" },
+    { "runner": "vitest", "file": "frontend/tmp/resultados-tests.json" }
+  ],
+  "baseBranch": "s3/start",
+  "coverage": [
+    { "layer": "backend", "file": "backend/coverage/coverage-final.json" },
+    { "layer": "frontend", "file": "frontend/coverage/coverage-final.json" }
+  ]
+}
