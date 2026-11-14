@@ -2,7 +2,8 @@ name: Test suite
 
 # Runs lint, typecheck and tests on every push to a PR. Unlike the adversarial
 # review, it doesn't use Claude: it consumes no tokens and its result is
-# deterministic.
+# deterministic. The end-to-end tests run in matrix.yml, with every other test,
+# because the traceability matrix needs all their results at once.
 
 on:
   pull_request:
@@ -55,25 +56,3 @@ jobs:
       - run: npm test
       # Includes the typecheck: tsc -b && vite build
       - run: npm run build
-
-  e2e:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-          cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
-      - name: Install backend
-        working-directory: backend
-        run: npm ci && cp .env.example .env && node ace generate:key
-      - name: Install frontend
-        working-directory: frontend
-        run: npm ci && npx playwright install --with-deps chromium
-      - name: Run end-to-end tests
-        working-directory: frontend
-        run: npm run test:e2e
