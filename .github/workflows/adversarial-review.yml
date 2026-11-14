@@ -12,6 +12,6 @@ permissions:
 
 jobs:
   review:
-    uses: abalbastrem/claude-config/.github/workflows/adversarial-review.yml@feat/ci-adversarial-review
+    uses: abalbastrem/claude-config/.github/workflows/adversarial-review.yml@main
     secrets:
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
