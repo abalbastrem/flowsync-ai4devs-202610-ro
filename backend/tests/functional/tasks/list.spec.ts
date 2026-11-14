@@ -30,8 +30,8 @@ test.group('Lista: la misma para todos los miembros', (group) => {
   }) => {
     const { ana, bruno } = await seedTeam()
 
-    const asAna = await client.get('/api/v1/tasks').loginAs(ana)
-    const asBruno = await client.get('/api/v1/tasks').loginAs(bruno)
+    const asAna = await client.visit('tasks.tasks.index').loginAs(ana)
+    const asBruno = await client.visit('tasks.tasks.index').loginAs(bruno)
 
     asAna.assertStatus(200)
     asBruno.assertStatus(200)
@@ -45,7 +45,7 @@ test.group('Lista: la misma para todos los miembros', (group) => {
   }) => {
     const { ana } = await seedTeam()
 
-    const response = await client.get('/api/v1/tasks').loginAs(ana)
+    const response = await client.visit('tasks.tasks.index').loginAs(ana)
 
     response.assertStatus(200)
     assert.include(titles(response.body()), 'Tarea de Bruno')
@@ -61,7 +61,7 @@ test.group('Lista: exige haber iniciado sesión', (group) => {
   }) => {
     await seedTeam()
 
-    const response = await client.get('/api/v1/tasks')
+    const response = await client.visit('tasks.tasks.index')
 
     response.assertStatus(401)
     assert.notProperty(response.body(), 'data')
@@ -74,7 +74,7 @@ test.group('Lista: cada tarea trae título, responsable y estado', (group) => {
   test('cada tarea del cuerpo incluye título, estado y responsable', async ({ client, assert }) => {
     const { ana } = await seedTeam()
 
-    const response = await client.get('/api/v1/tasks').loginAs(ana)
+    const response = await client.visit('tasks.tasks.index').loginAs(ana)
 
     response.assertStatus(200)
     for (const task of response.body().data) {
@@ -104,7 +104,7 @@ test.group('Lista: el responsable se identifica por su nombre', (group) => {
     })
     await Task.create({ title: 'Sin nombre', assigneeId: anonymous.id, status: 'pending' })
 
-    const response = await client.get('/api/v1/tasks').loginAs(ana)
+    const response = await client.visit('tasks.tasks.index').loginAs(ana)
 
     response.assertStatus(200)
     const [task] = response.body().data
@@ -127,7 +127,7 @@ test.group('Lista: las más recientes primero', (group) => {
       await Task.create({ title, assigneeId: ana.id, status: 'pending' })
     }
 
-    const response = await client.get('/api/v1/tasks').loginAs(ana)
+    const response = await client.visit('tasks.tasks.index').loginAs(ana)
 
     response.assertStatus(200)
     assert.deepEqual(
@@ -143,7 +143,7 @@ test.group('Lista: sin fechas', (group) => {
   test('las tareas de la respuesta no incluyen campos de fecha', async ({ client, assert }) => {
     const { ana } = await seedTeam()
 
-    const response = await client.get('/api/v1/tasks').loginAs(ana)
+    const response = await client.visit('tasks.tasks.index').loginAs(ana)
 
     response.assertStatus(200)
     for (const task of response.body().data) {
@@ -171,7 +171,7 @@ test.group('Lista: consultarla no modifica nada', (group) => {
     const before = await snapshot()
 
     for (let i = 0; i < 3; i++) {
-      const response = await client.get('/api/v1/tasks').loginAs(ana)
+      const response = await client.visit('tasks.tasks.index').loginAs(ana)
       response.assertStatus(200)
     }
 
