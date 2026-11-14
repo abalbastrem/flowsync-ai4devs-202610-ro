@@ -1,0 +1,23 @@
+name: Traceability matrix
+
+# The pre-push hook is the local gate of the matrix; this is the net for whatever
+# skips it. Runs every test (backend, frontend, e2e) and `matrix.ts --check`:
+# see the "La matriu al CI" section of the claude-config README.
+on:
+  pull_request:
+
+concurrency:
+  group: matrix-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  matrix:
+    uses: abalbastrem/claude-config/.github/workflows/matrix-check.yml@feat/ci-matrix-check
+    with:
+      matrix-dir: docs/trazabilidad
+      setup: |
+        cd backend && npm ci && cp .env.example .env && node ace generate:key && node ace migration:run --force
+        cd ../frontend && npm ci && npx playwright install --with-deps chromium
