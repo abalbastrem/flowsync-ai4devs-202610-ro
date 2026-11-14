@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   matrix:
-    uses: abalbastrem/claude-config/.github/workflows/matrix-check.yml@feat/ci-matrix-check
+    uses: abalbastrem/claude-config/.github/workflows/matrix-check.yml@main
     with:
       matrix-dir: docs/trazabilidad
       setup: |
