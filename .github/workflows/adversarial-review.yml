@@ -1,0 +1,17 @@
+name: Adversarial review
+
+# The reviewer is shared by all my repos: see the "El revisor adversarial al CI"
+# section of the claude-config README.
+on:
+  pull_request:
+    types: [opened, ready_for_review, labeled]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    uses: abalbastrem/claude-config/.github/workflows/adversarial-review.yml@main
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
