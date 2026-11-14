@@ -17,7 +17,7 @@ test.group('Tareas: crear con solo el título', (group) => {
     })
 
     const response = await client
-      .post('/api/v1/tasks')
+      .visit('tasks.tasks.store')
       .json({ title: 'Preparar la demo' })
       .loginAs(user)
 
@@ -27,7 +27,7 @@ test.group('Tareas: crear con solo el título', (group) => {
   })
 
   test('sin sesión, responde 401 y no crea ninguna tarea', async ({ client, assert }) => {
-    const response = await client.post('/api/v1/tasks').json({ title: 'Preparar la demo' })
+    const response = await client.visit('tasks.tasks.store').json({ title: 'Preparar la demo' })
 
     response.assertStatus(401)
     assert.lengthOf(await Task.all(), 0)
@@ -47,8 +47,8 @@ test.group('Tareas: nacen mías y en «Pendiente»', (group) => {
       password: 'secret-password',
     })
 
-    const created = await client.post('/api/v1/tasks').json({ title: 'Mía' }).loginAs(ana)
-    const listed = await client.get('/api/v1/tasks').loginAs(ana)
+    const created = await client.visit('tasks.tasks.store').json({ title: 'Mía' }).loginAs(ana)
+    const listed = await client.visit('tasks.tasks.index').loginAs(ana)
 
     created.assertStatus(201)
     assert.equal(created.body().data.assignee.id, ana.id)
@@ -63,7 +63,7 @@ test.group('Tareas: nacen mías y en «Pendiente»', (group) => {
       password: 'secret-password',
     })
 
-    const created = await client.post('/api/v1/tasks').json({ title: 'Nueva' }).loginAs(ana)
+    const created = await client.visit('tasks.tasks.store').json({ title: 'Nueva' }).loginAs(ana)
 
     created.assertStatus(201)
     assert.equal(created.body().data.status, 'pending')
