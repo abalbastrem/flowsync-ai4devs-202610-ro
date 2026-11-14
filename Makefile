@@ -140,6 +140,8 @@ test: ## Ejecuta todos los tests y guarda sus resultados
 	( cd $(BACKEND) && npx c8 node ace test --reporters=spec --reporters=ndjson | tee tmp/resultados-tests.ndjson | grep -v '^{' ) || fallo=1; \
 	echo "==> Tests del frontend"; \
 	( cd $(FRONTEND) && npx vitest run --coverage --reporter=default --reporter=json --outputFile.json=tmp/resultados-tests.json ) || fallo=1; \
+	echo "==> Tests end-to-end"; \
+	( cd $(FRONTEND) && npx playwright test ) || fallo=1; \
 	exit $$fallo
 
 matriz: ## Regenera la matriz de trazabilidad con los últimos resultados

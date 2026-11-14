@@ -1,7 +1,8 @@
 {
   "results": [
     { "runner": "japa", "file": "backend/tmp/resultados-tests.ndjson", "root": "backend" },
-    { "runner": "vitest", "file": "frontend/tmp/resultados-tests.json" }
+    { "runner": "vitest", "file": "frontend/tmp/resultados-tests.json" },
+    { "runner": "playwright", "file": "frontend/tmp/resultados-e2e.json" }
   ],
   "baseBranch": "s3/start",
   "coverage": [
