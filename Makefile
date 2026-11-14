@@ -41,7 +41,7 @@ help: ## Muestra esta ayuda
 
 setup: install env migrate hooks ## Deja el proyecto listo para arrancar
 	@echo ""
-	@echo "OK: Setup completado. Arranca todo con: make start"
+	@echo "✅ Setup completado. Arranca todo con: make start"
 
 # El hook pre-push bloquea el push si la matriz de trazabilidad no está en verde
 # (ver la sección «Traceability matrix» del README de claude-config).
@@ -50,35 +50,35 @@ hooks:
 	@echo "==> Hooks de git activados (.githooks/)."
 
 install:
-	@command -v node >/dev/null 2>&1 || { echo "ERROR: Node.js no está instalado."; exit 1; }
-	@command -v npm  >/dev/null 2>&1 || { echo "ERROR: npm no está instalado."; exit 1; }
-	@echo "==> Instalando dependencias del backend..."
+	@command -v node >/dev/null 2>&1 || { echo "❌ Node.js no está instalado."; exit 1; }
+	@command -v npm  >/dev/null 2>&1 || { echo "❌ npm no está instalado."; exit 1; }
+	@echo "📦 Instalando dependencias del backend..."
 	@cd $(BACKEND) && npm install
-	@echo "==> Instalando dependencias del frontend..."
+	@echo "📦 Instalando dependencias del frontend..."
 	@cd $(FRONTEND) && npm install
 
 env:
 	@if [ ! -f $(BACKEND)/.env ]; then \
-		echo "==> Creando $(BACKEND)/.env desde .env.example..."; \
+		echo "📝 Creando $(BACKEND)/.env desde .env.example..."; \
 		cp $(BACKEND)/.env.example $(BACKEND)/.env; \
 	else \
-		echo "==> $(BACKEND)/.env ya existe, no se toca."; \
+		echo "📝 $(BACKEND)/.env ya existe, no se toca."; \
 	fi
 	@if [ ! -f $(FRONTEND)/.env ]; then \
-		echo "==> Creando $(FRONTEND)/.env desde .env.example..."; \
+		echo "📝 Creando $(FRONTEND)/.env desde .env.example..."; \
 		cp $(FRONTEND)/.env.example $(FRONTEND)/.env; \
 	else \
-		echo "==> $(FRONTEND)/.env ya existe, no se toca."; \
+		echo "📝 $(FRONTEND)/.env ya existe, no se toca."; \
 	fi
 	@if grep -Eq '^APP_KEY=.+' $(BACKEND)/.env; then \
-		echo "==> APP_KEY ya definida, no se regenera."; \
+		echo "🔑 APP_KEY ya definida, no se regenera."; \
 	else \
-		echo "==> Generando APP_KEY..."; \
+		echo "🔑 Generando APP_KEY..."; \
 		cd $(BACKEND) && node ace generate:key; \
 	fi
 
 migrate:
-	@echo "==> Ejecutando migraciones..."
+	@echo "🗃️  Ejecutando migraciones..."
 	@cd $(BACKEND) && node ace migration:run
 
 # ---------------------------------------------------------------------------
@@ -109,19 +109,19 @@ migrate:
 # provocaría un SIGTTIN, colgando el "Press h" de Adonis y los atajos de Vite.
 start: ## Levanta backend y frontend a la vez
 	@if [ ! -d $(BACKEND)/node_modules ] || [ ! -d $(FRONTEND)/node_modules ]; then \
-		echo "ERROR: Faltan dependencias. Ejecuta primero: make setup"; exit 1; \
+		echo "❌ Faltan dependencias. Ejecuta primero: make setup"; exit 1; \
 	fi
 	@if [ ! -f $(BACKEND)/.env ]; then \
-		echo "ERROR: Falta $(BACKEND)/.env. Ejecuta primero: make setup"; exit 1; \
+		echo "❌ Falta $(BACKEND)/.env. Ejecuta primero: make setup"; exit 1; \
 	fi
-	@echo "==> Arrancando backend (http://localhost:3333) y frontend (http://localhost:5173)..."
+	@echo "🚀 Arrancando backend (http://localhost:3333) y frontend (http://localhost:5173)..."
 	@echo "   Ctrl-C para parar los dos. Si uno se cae, el otro se cierra también."
 	@echo ""
 	@trap 'trap - INT TERM EXIT; kill -INT 0' INT TERM EXIT; \
 	( cd $(BACKEND)  && npm run dev; \
-	  echo ""; echo "AVISO: El backend se ha parado. Cerrando el frontend."; kill -INT 0 ) & \
+	  echo ""; echo "⚠️  El backend se ha parado. Cerrando el frontend."; kill -INT 0 ) & \
 	( cd $(FRONTEND) && npm run dev; \
-	  echo ""; echo "AVISO: El frontend se ha parado. Cerrando el backend."; kill -INT 0 ) & \
+	  echo ""; echo "⚠️  El frontend se ha parado. Cerrando el backend."; kill -INT 0 ) & \
 	wait
 
 # ---------------------------------------------------------------------------
@@ -131,7 +131,12 @@ start: ## Levanta backend y frontend a la vez
 # Los runners de tests transpilan sin comprobar tipos: un error de tipos puede
 # esconderse detrás de una suite en verde. Comprueba los dos aunque uno falle.
 typecheck: ## Comprueba los tipos de backend y frontend
-	@fallo=0; 	echo "==> Typecheck del backend"; 	( cd $(BACKEND) && npx tsc --noEmit ) || fallo=1; 	echo "==> Typecheck del frontend"; 	( cd $(FRONTEND) && npx tsc -b ) || fallo=1; 	exit $$fallo
+	@fallo=0; \
+	echo "==> Typecheck del backend"; \
+	( cd $(BACKEND) && npx tsc --noEmit ) || fallo=1; \
+	echo "==> Typecheck del frontend"; \
+	( cd $(FRONTEND) && npx tsc -b ) || fallo=1; \
+	exit $$fallo
 
 # Corre backend y frontend aunque uno falle, para que la matriz tenga todos los
 # resultados, y sale con error si alguna ha fallado. Cada runner deja sus
@@ -164,7 +169,7 @@ matriz-viva: ## Abre la matriz en el navegador y la repinta con cada ejecución
 # ---------------------------------------------------------------------------
 
 clean: ## Borra node_modules y la base de datos SQLite
-	@echo "==> Limpiando..."
+	@echo "🧹 Limpiando..."
 	@rm -rf $(BACKEND)/node_modules $(FRONTEND)/node_modules
 	@rm -f $(BACKEND)/tmp/db.sqlite3 $(BACKEND)/tmp/db.sqlite3-wal $(BACKEND)/tmp/db.sqlite3-shm
-	@echo "OK: Listo. Vuelve a ejecutar: make setup"
+	@echo "✅ Listo. Vuelve a ejecutar: make setup"
