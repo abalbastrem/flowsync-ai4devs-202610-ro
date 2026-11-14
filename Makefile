@@ -20,7 +20,7 @@ MATRIZ := node "$(CLAUDE_CONFIG)/tools/matrix"
 MATRIZ_DIR := docs/trazabilidad
 
 .DEFAULT_GOAL := help
-.PHONY: help setup start install env migrate hooks clean test matriz matriz-check matriz-viva
+.PHONY: help setup start install env migrate hooks clean typecheck test matriz matriz-check matriz-viva
 
 # La ayuda se genera a partir de los comentarios `## ...` de cada target, para
 # que no haya un segundo listado que mantener a mano y que pueda divergir.
@@ -123,6 +123,11 @@ start: ## Levanta backend y frontend a la vez
 # ---------------------------------------------------------------------------
 # tests y matriz de trazabilidad (claude-config/tools/matrix)
 # ---------------------------------------------------------------------------
+
+# Los runners de tests transpilan sin comprobar tipos: un error de tipos puede
+# esconderse detrás de una suite en verde. Comprueba los dos aunque uno falle.
+typecheck: ## Comprueba los tipos de backend y frontend
+	@fallo=0; 	echo "==> Typecheck del backend"; 	( cd $(BACKEND) && npx tsc --noEmit ) || fallo=1; 	echo "==> Typecheck del frontend"; 	( cd $(FRONTEND) && npx tsc -b ) || fallo=1; 	exit $$fallo
 
 # Corre backend y frontend aunque uno falle, para que la matriz tenga todos los
 # resultados, y sale con error si alguna ha fallado. Cada runner deja sus

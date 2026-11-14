@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Bloquea el push si la matriz de trazabilidad no está en verde: tests sin escenario,
+# Bloquea el push si hay errores de tipos o si la matriz de trazabilidad no está en verde: tests sin escenario,
 # escenarios sin test, en rojo u omitidos, o docs/trazabilidad/matrix.md desfasada.
 # Para saltártelo a conciencia: git push --no-verify
 set -e
+make typecheck
 make test
 make matriz-check
