@@ -33,13 +33,15 @@ export type Resultado = {
   markdown: string
 }
 
-type Config = { prefijos: Record<string, string>; resultados: { runner: string; ruta: string }[] }
+type Config = { resultados: { runner: string; ruta: string }[] }
 type EscenarioSpec = Omit<Escenario, 'estado' | 'tests'>
 
 const RUTA_MATRIZ = 'docs/trazabilidad/matriz.md'
 const RUTA_ESTADO = 'docs/trazabilidad/estado.json'
 const RUTA_CONFIG = 'docs/trazabilidad/config.json'
-const ID_EN_TITULO = /\b[A-Z]{2,5}-\d+\b/g
+// Un ID por escenario, único en todo el repo: SC-1, SC-2… La capability y el requisito
+// son columnas propias de la matriz, así que el ID no los repite.
+const ID_EN_TITULO = /\bSC-\d+\b/g
 
 const aPosix = (ruta: string) => ruta.split(sep).join('/').replace(/\\/g, '/')
 
@@ -80,30 +82,21 @@ function leerSpec(ruta: string): Bloque[] {
     }
     const esc = linea.match(/^#### Scenario:\s*(.+?)\s*$/)
     if (esc && actual) {
-      const conId = esc[1].match(/^\[([A-Z]{2,5}-\d+)\]\s*(.*)$/)
+      const conId = esc[1].match(/^\[(SC-\d+)\]\s*(.*)$/)
       actual.escenarios.push(conId ? { id: conId[1], nombre: conId[2] } : { id: null, nombre: esc[1] })
     }
   }
   return bloques
 }
 
-function leerEscenarios(raiz: string, config: Config, errores: string[]): EscenarioSpec[] {
+function leerEscenarios(raiz: string, errores: string[]): EscenarioSpec[] {
   const porRequisito = new Map<string, EscenarioSpec[]>()
   const clave = (cap: string, req: string) => `${cap}\u0000${req}`
   const vistos = new Set<string>()
 
-  const validar = (cap: string, id: string | null, nombre: string, donde: string): id is string => {
+  const validar = (id: string | null, nombre: string, donde: string): id is string => {
     if (!id) {
-      errores.push(`Escenario sin ID en ${donde}: «${nombre}». Añade [PREFIJO-n] al título.`)
-      return false
-    }
-    const prefijo = config.prefijos[cap]
-    if (!prefijo) {
-      errores.push(`La capability «${cap}» no tiene prefijo en ${RUTA_CONFIG}.`)
-      return false
-    }
-    if (!id.startsWith(`${prefijo}-`)) {
-      errores.push(`${id} en ${donde} no lleva el prefijo de «${cap}» (${prefijo}).`)
+      errores.push(`Escenario sin ID en ${donde}: «${nombre}». Añade [SC-n] al título, con el siguiente número libre.`)
       return false
     }
     return true
@@ -114,7 +107,7 @@ function leerEscenarios(raiz: string, config: Config, errores: string[]): Escena
     for (const b of leerSpec(ruta)) {
       const lista: EscenarioSpec[] = []
       for (const e of b.escenarios) {
-        if (!validar(capability, e.id, e.nombre, donde)) continue
+        if (!validar(e.id, e.nombre, donde)) continue
         if (vistos.has(e.id)) errores.push(`ID repetido: ${e.id} (${donde}).`)
         vistos.add(e.id)
         lista.push({ id: e.id, nombre: e.nombre, capability, requisito: b.requisito, origen: 'spec' })
@@ -141,7 +134,7 @@ function leerEscenarios(raiz: string, config: Config, errores: string[]): Escena
         const previos = new Set((porRequisito.get(k) ?? []).map((e) => e.id))
         const lista: EscenarioSpec[] = []
         for (const e of b.escenarios) {
-          if (!validar(capability, e.id, e.nombre, donde)) continue
+          if (!validar(e.id, e.nombre, donde)) continue
           if (vistos.has(e.id) && !(b.seccion === 'MODIFIED' && previos.has(e.id))) {
             errores.push(`ID repetido: ${e.id} (${donde}).`)
           }
@@ -212,22 +205,18 @@ function markdown(escenarios: Escenario[], huerfanos: Test[]): string {
     'Relación entre los escenarios de OpenSpec y los tests que los verifican. El estado de cada test no se versiona: lo pinta la vista viva (`make matriz-viva`). Por qué y cómo: [ADR 0002](../adr/0002-matriz-de-trazabilidad.md).',
     '',
   ]
+  l.push('| Capability | Requisito | Escenario | Tests |', '|---|---|---|---|')
   const caps = [...new Set(escenarios.map((e) => e.capability))].sort()
   for (const cap of caps) {
-    l.push(`## ${cap}`, '')
-    const deCap = escenarios.filter((e) => e.capability === cap)
-    for (const req of [...new Set(deCap.map((e) => e.requisito))]) {
-      l.push(`### ${req}`, '', '| ID | Escenario | Origen | Tests |', '|---|---|---|---|')
-      for (const e of deCap.filter((x) => x.requisito === req)) {
-        const tests = e.tests.length
-          ? e.tests.map((t) => `${celda(t.titulo)} (${t.nivel}, \`${t.archivo}\`)`).join('<br>')
-          : '—'
-        l.push(`| ${e.id} | ${celda(e.nombre)} | ${e.origen} | ${tests} |`)
-      }
-      l.push('')
+    for (const e of escenarios.filter((x) => x.capability === cap)) {
+      const enCurso = e.origen === 'spec' ? '' : ` _(${e.origen})_`
+      const tests = e.tests.length
+        ? e.tests.map((t) => `${celda(t.titulo)} (${t.nivel}, \`${t.archivo}\`)`).join('<br>')
+        : '—'
+      l.push(`| ${cap} | ${celda(e.requisito)} | ${e.id} · ${celda(e.nombre)}${enCurso} | ${tests} |`)
     }
   }
-  l.push('## Tests sin escenario', '')
+  l.push('', '## Tests sin escenario', '')
   if (huerfanos.length) {
     for (const t of huerfanos) l.push(`- ${t.titulo} (${t.nivel}, \`${t.archivo}\`)`)
   } else {
@@ -239,7 +228,7 @@ function markdown(escenarios: Escenario[], huerfanos: Test[]): string {
 export function generar(raiz: string): Resultado {
   const errores: string[] = []
   const config: Config = JSON.parse(readFileSync(join(raiz, RUTA_CONFIG), 'utf8'))
-  const specs = leerEscenarios(raiz, config, errores)
+  const specs = leerEscenarios(raiz, errores)
 
   const tests: Test[] = []
   const faltanResultados: string[] = []
