@@ -4,7 +4,7 @@ import { AppRoutes } from '@/routes/app-routes'
 import { renderWithSession } from '@/test/render'
 
 describe('La lista exige haber iniciado sesión', () => {
-  it('sin sesión, abrir la lista lleva al inicio de sesión sin mostrar tareas', async () => {
+  it('SC-15 · sin sesión, abrir la lista lleva al inicio de sesión sin mostrar tareas', async () => {
     renderWithSession(<AppRoutes />, { user: null, route: '/' })
 
     expect(await screen.findByText('Inicia sesión')).toBeInTheDocument()
