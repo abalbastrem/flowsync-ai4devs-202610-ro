@@ -19,6 +19,10 @@ CLAUDE_CONFIG ?= $(HOME)/projects/software/claude-config
 MATRIZ := node "$(CLAUDE_CONFIG)/tools/matrix"
 MATRIZ_DIR := docs/trazabilidad
 
+# El pre-push es la puerta de la matriz: si no está activo, que se vea.
+# `npm install` lo activa (script `prepare`); `make hooks` también.
+AVISO_HOOKS = [ "$$(git config core.hooksPath)" = .githooks ] || echo "AVISO: el hook pre-push no se ha activado, y nada impide un push con la matriz en rojo. Para activarlo: make hooks"
+
 .DEFAULT_GOAL := help
 .PHONY: help setup start install env migrate hooks clean typecheck test matriz matriz-check matriz-viva
 
@@ -133,6 +137,7 @@ typecheck: ## Comprueba los tipos de backend y frontend
 # resultados, y sale con error si alguna ha fallado. Cada runner deja sus
 # resultados en su tmp/, que es de donde los lee la matriz.
 test: ## Ejecuta todos los tests y guarda sus resultados
+	@$(AVISO_HOOKS)
 	@set -o pipefail; fallo=0; \
 	mkdir -p $(BACKEND)/tmp $(FRONTEND)/tmp; \
 	$(MATRIZ)/matrix.ts --dir $(MATRIZ_DIR) --stamp; \
@@ -145,6 +150,7 @@ test: ## Ejecuta todos los tests y guarda sus resultados
 	exit $$fallo
 
 matriz: ## Regenera la matriz de trazabilidad con los últimos resultados
+	@$(AVISO_HOOKS)
 	@$(MATRIZ)/matrix.ts --dir $(MATRIZ_DIR)
 
 matriz-check: ## Falla si la matriz tiene huecos, rojos o está desfasada
