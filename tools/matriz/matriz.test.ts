@@ -18,7 +18,6 @@ function proyecto(archivos: Archivos): string {
   const raiz = mkdtempSync(join(tmpdir(), 'matriz-'))
   const base: Archivos = {
     'docs/trazabilidad/config.json': JSON.stringify({
-      prefijos: { 'task-list': 'TL', tasks: 'TA' },
       resultados: [
         { runner: 'japa', ruta: 'backend/tmp/resultados-tests.ndjson' },
         { runner: 'vitest', ruta: 'frontend/tmp/resultados-tests.json' },
@@ -95,18 +94,18 @@ function escenario(raiz: string, id: string) {
   return estado(raiz).escenarios.find((e: { id: string }) => e.id === id)
 }
 
-const LISTA = { 'openspec/specs/task-list/spec.md': spec({ 'La lista es compartida': ['[TL-1] Dos personas ven lo mismo', '[TL-2] Sin permisos especiales'] }) }
+const LISTA = { 'openspec/specs/task-list/spec.md': spec({ 'La lista es compartida': ['[SC-1] Dos personas ven lo mismo', '[SC-2] Sin permisos especiales'] }) }
 
 test('estados · un escenario sin ningún test queda en «sin-test»', () => {
   const raiz = proyecto(LISTA)
   assert.equal(ejecutar(raiz).codigo, 0)
-  assert.equal(escenario(raiz, 'TL-1').estado, 'sin-test')
+  assert.equal(escenario(raiz, 'SC-1').estado, 'sin-test')
 })
 
 test('estados · un escenario con todos sus tests en verde queda en «pasa»', () => {
-  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'TL-1 · dos personas reciben lo mismo' }]) })
+  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'SC-1 · dos personas reciben lo mismo' }]) })
   ejecutar(raiz)
-  const e = escenario(raiz, 'TL-1')
+  const e = escenario(raiz, 'SC-1')
   assert.equal(e.estado, 'pasa')
   assert.equal(e.tests[0].nivel, 'interfaz pública')
 })
@@ -114,60 +113,60 @@ test('estados · un escenario con todos sus tests en verde queda en «pasa»', (
 test('estados · basta un test que falla para que el escenario quede en «falla»', () => {
   const raiz = proyecto({
     ...LISTA,
-    'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'TL-1 · por la API' }]),
-    'frontend/tmp/resultados-tests.json': vitest([{ titulo: 'TL-1 · en pantalla', estado: 'failed' }]),
+    'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'SC-1 · por la API' }]),
+    'frontend/tmp/resultados-tests.json': vitest([{ titulo: 'SC-1 · en pantalla', estado: 'failed' }]),
   })
   ejecutar(raiz)
-  assert.equal(escenario(raiz, 'TL-1').estado, 'falla')
+  assert.equal(escenario(raiz, 'SC-1').estado, 'falla')
 })
 
 test('estados · un escenario con solo tests omitidos queda en «omitido»', () => {
   const raiz = proyecto({
     ...LISTA,
-    'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'TL-1 · pendiente', omitido: true }]),
-    'frontend/tmp/resultados-tests.json': vitest([{ titulo: 'TL-2 · por hacer', estado: 'todo' }]),
+    'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'SC-1 · pendiente', omitido: true }]),
+    'frontend/tmp/resultados-tests.json': vitest([{ titulo: 'SC-2 · por hacer', estado: 'todo' }]),
   })
   ejecutar(raiz)
-  assert.equal(escenario(raiz, 'TL-1').estado, 'omitido')
-  assert.equal(escenario(raiz, 'TL-2').estado, 'omitido')
+  assert.equal(escenario(raiz, 'SC-1').estado, 'omitido')
+  assert.equal(escenario(raiz, 'SC-2').estado, 'omitido')
 })
 
 test('niveles · el nivel sale del runner y de la suite', () => {
   const raiz = proyecto({
     ...LISTA,
     'backend/tmp/resultados-tests.ndjson': japa([
-      { titulo: 'TL-1 · por la API' },
-      { titulo: 'TL-1 · lógica', suite: 'unit' },
+      { titulo: 'SC-1 · por la API' },
+      { titulo: 'SC-1 · lógica', suite: 'unit' },
     ]),
-    'frontend/tmp/resultados-tests.json': vitest([{ titulo: 'TL-1 · en pantalla' }]),
+    'frontend/tmp/resultados-tests.json': vitest([{ titulo: 'SC-1 · en pantalla' }]),
   })
   ejecutar(raiz)
-  const niveles = escenario(raiz, 'TL-1').tests.map((t: { nivel: string }) => t.nivel).sort()
+  const niveles = escenario(raiz, 'SC-1').tests.map((t: { nivel: string }) => t.nivel).sort()
   assert.deepEqual(niveles, ['componente', 'interfaz pública', 'unitario'])
 })
 
 test('cruce · un test con dos IDs cubre los dos escenarios', () => {
-  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'TL-1 TL-2 · lista compartida y sin permisos' }]) })
+  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'SC-1 SC-2 · lista compartida y sin permisos' }]) })
   ejecutar(raiz)
-  assert.equal(escenario(raiz, 'TL-1').estado, 'pasa')
-  assert.equal(escenario(raiz, 'TL-2').estado, 'pasa')
+  assert.equal(escenario(raiz, 'SC-1').estado, 'pasa')
+  assert.equal(escenario(raiz, 'SC-2').estado, 'pasa')
 })
 
 test('huérfanos · un test sin ID y uno con un ID inexistente son tests sin escenario', () => {
   const raiz = proyecto({
     ...LISTA,
-    'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'responde 201' }, { titulo: 'TL-99 · no existe' }]),
+    'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'responde 201' }, { titulo: 'SC-99 · no existe' }]),
   })
   ejecutar(raiz)
   const titulos = estado(raiz).huerfanos.map((t: { titulo: string }) => t.titulo).sort()
-  assert.deepEqual(titulos, ['TL-99 · no existe', 'responde 201'])
+  assert.deepEqual(titulos, ['SC-99 · no existe', 'responde 201'])
 })
 
 test('specs · un ID repetido es un error', () => {
-  const raiz = proyecto({ 'openspec/specs/task-list/spec.md': spec({ R: ['[TL-1] Uno', '[TL-1] Otro'] }) })
+  const raiz = proyecto({ 'openspec/specs/task-list/spec.md': spec({ R: ['[SC-1] Uno', '[SC-1] Otro'] }) })
   const r = ejecutar(raiz)
   assert.notEqual(r.codigo, 0)
-  assert.match(r.salida, /TL-1/)
+  assert.match(r.salida, /SC-1/)
 })
 
 test('specs · un escenario sin ID es un error', () => {
@@ -177,42 +176,46 @@ test('specs · un escenario sin ID es un error', () => {
   assert.match(r.salida, /Sin identificador/)
 })
 
-test('specs · un ID con el prefijo de otra capability es un error', () => {
-  const raiz = proyecto({ 'openspec/specs/task-list/spec.md': spec({ R: ['[TA-1] Prefijo ajeno'] }) })
+test('specs · un ID que no tiene la forma SC-n es un error', () => {
+  const raiz = proyecto({ 'openspec/specs/task-list/spec.md': spec({ R: ['[TL-1] Formato viejo'] }) })
   const r = ejecutar(raiz)
   assert.notEqual(r.codigo, 0)
-  assert.match(r.salida, /TA-1/)
+  assert.match(r.salida, /Formato viejo/)
 })
 
-test('specs · una capability sin prefijo registrado es un error', () => {
-  const raiz = proyecto({ 'openspec/specs/nueva/spec.md': spec({ R: ['[NU-1] Algo'] }) })
+test('specs · el número es único en todo el repo, no por capability', () => {
+  const raiz = proyecto({
+    'openspec/specs/task-list/spec.md': spec({ R: ['[SC-1] En la lista'] }),
+    'openspec/specs/tasks/spec.md': spec({ R: ['[SC-1] En las tareas'] }),
+  })
   const r = ejecutar(raiz)
   assert.notEqual(r.codigo, 0)
-  assert.match(r.salida, /nueva/)
+  assert.match(r.salida, /SC-1/)
 })
 
 test('changes · un change en curso añade sus escenarios y sustituye los del requisito que modifica', () => {
   const delta =
-    '## ADDED Requirements\n\n### Requirement: Filtrar\n\nSHALL.\n\n#### Scenario: [TL-3] Por estado\n\n- **WHEN** a\n- **THEN** b\n\n' +
-    '## MODIFIED Requirements\n\n### Requirement: La lista es compartida\n\nSHALL.\n\n#### Scenario: [TL-1] Dos personas ven lo mismo, también filtrado\n\n- **WHEN** a\n- **THEN** b\n'
+    '## ADDED Requirements\n\n### Requirement: Filtrar\n\nSHALL.\n\n#### Scenario: [SC-3] Por estado\n\n- **WHEN** a\n- **THEN** b\n\n' +
+    '## MODIFIED Requirements\n\n### Requirement: La lista es compartida\n\nSHALL.\n\n#### Scenario: [SC-1] Dos personas ven lo mismo, también filtrado\n\n- **WHEN** a\n- **THEN** b\n'
   const raiz = proyecto({
     ...LISTA,
     'openspec/changes/filtro/specs/task-list/spec.md': delta,
-    'openspec/changes/archive/2026-01-01-viejo/specs/task-list/spec.md': '## ADDED Requirements\n\n### Requirement: X\n\nSHALL.\n\n#### Scenario: [TL-50] Archivado\n\n- **WHEN** a\n- **THEN** b\n',
+    'openspec/changes/archive/2026-01-01-viejo/specs/task-list/spec.md': '## ADDED Requirements\n\n### Requirement: X\n\nSHALL.\n\n#### Scenario: [SC-50] Archivado\n\n- **WHEN** a\n- **THEN** b\n',
   })
   ejecutar(raiz)
   const ids = estado(raiz).escenarios.map((e: { id: string }) => e.id).sort()
-  assert.deepEqual(ids, ['TL-1', 'TL-3'])
-  assert.equal(escenario(raiz, 'TL-3').origen, 'change: filtro')
-  assert.equal(escenario(raiz, 'TL-1').nombre, 'Dos personas ven lo mismo, también filtrado')
+  assert.deepEqual(ids, ['SC-1', 'SC-3'])
+  assert.equal(escenario(raiz, 'SC-3').origen, 'change: filtro')
+  assert.equal(escenario(raiz, 'SC-1').nombre, 'Dos personas ven lo mismo, también filtrado')
 })
 
 test('matriz.md · lista escenarios y tests con su nivel, sin estado', () => {
-  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'TL-1 · por la API', falla: true }]) })
+  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'SC-1 · por la API', falla: true }]) })
   ejecutar(raiz)
   const md = readFileSync(join(raiz, 'docs/trazabilidad/matriz.md'), 'utf8')
-  assert.match(md, /TL-1/)
-  assert.match(md, /TL-1 · por la API/)
+  assert.match(md, /\| Capability \| Requisito \| Escenario \| Tests \|/)
+  assert.match(md, /\| task-list \| La lista es compartida \| SC-1 · Dos personas ven lo mismo \|/)
+  assert.match(md, /SC-1 · por la API/)
   assert.match(md, /interfaz pública/)
   assert.doesNotMatch(md, /falla|pasa|sin-test/)
 })
@@ -222,19 +225,19 @@ test('--check · bloquea si hay escenarios sin test', () => {
   ejecutar(raiz)
   const r = ejecutar(raiz, '--check')
   assert.notEqual(r.codigo, 0)
-  assert.match(r.salida, /TL-1/)
+  assert.match(r.salida, /SC-1/)
 })
 
 test('--check · bloquea si hay tests que fallan', () => {
-  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'TL-1 TL-2 · todo', falla: true }]) })
+  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'SC-1 SC-2 · todo', falla: true }]) })
   ejecutar(raiz)
   const r = ejecutar(raiz, '--check')
   assert.notEqual(r.codigo, 0)
-  assert.match(r.salida, /fallan.*TL-1|TL-1.*fallan/s)
+  assert.match(r.salida, /fallan.*SC-1|SC-1.*fallan/s)
 })
 
 test('--check · bloquea si hay tests sin escenario', () => {
-  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'TL-1 TL-2 · todo' }, { titulo: 'sin ID' }]) })
+  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'SC-1 SC-2 · todo' }, { titulo: 'sin ID' }]) })
   ejecutar(raiz)
   const r = ejecutar(raiz, '--check')
   assert.notEqual(r.codigo, 0)
@@ -242,22 +245,22 @@ test('--check · bloquea si hay tests sin escenario', () => {
 })
 
 test('--check · bloquea si hay escenarios con solo tests omitidos', () => {
-  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'TL-1 TL-2 · todo', omitido: true }]) })
+  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'SC-1 SC-2 · todo', omitido: true }]) })
   ejecutar(raiz)
   const r = ejecutar(raiz, '--check')
   assert.notEqual(r.codigo, 0)
-  assert.match(r.salida, /omitidos.*TL-1|TL-1.*omitidos/s)
+  assert.match(r.salida, /omitidos.*SC-1|SC-1.*omitidos/s)
 })
 
 test('--check · bloquea si matriz.md no está al día', () => {
-  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'TL-1 TL-2 · todo' }]) })
+  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'SC-1 SC-2 · todo' }]) })
   const r = ejecutar(raiz, '--check')
   assert.notEqual(r.codigo, 0)
   assert.match(r.salida, /matriz\.md/)
 })
 
 test('--check · pasa con todo en verde y matriz.md al día, sin reescribir nada', () => {
-  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'TL-1 TL-2 · todo' }]) })
+  const raiz = proyecto({ ...LISTA, 'backend/tmp/resultados-tests.ndjson': japa([{ titulo: 'SC-1 SC-2 · todo' }]) })
   ejecutar(raiz)
   const antes = readFileSync(join(raiz, 'docs/trazabilidad/matriz.md'), 'utf8')
   const r = ejecutar(raiz, '--check')
@@ -278,5 +281,5 @@ test('resultados · sin archivo de resultados, la matriz se genera igual, toda e
   for (const r of ['backend/tmp/resultados-tests.ndjson', 'frontend/tmp/resultados-tests.json']) writeFileSync(join(raiz, r), '')
   assert.equal(ejecutar(raiz).codigo, 0)
   assert.ok(existsSync(join(raiz, 'docs/trazabilidad/matriz.md')))
-  assert.equal(escenario(raiz, 'TL-2').estado, 'sin-test')
+  assert.equal(escenario(raiz, 'SC-2').estado, 'sin-test')
 })
