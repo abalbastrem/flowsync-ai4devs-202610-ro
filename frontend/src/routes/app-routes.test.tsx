@@ -6,7 +6,7 @@ import { API, server } from '@/test/server'
 import { renderWithSession } from '@/test/render'
 
 describe('Hay una sola lista de tareas', () => {
-  it('la navegación solo ofrece la lista del equipo y el perfil, sin vista «mis tareas»', async () => {
+  it('SC-4 · la navegación solo ofrece la lista del equipo y el perfil, sin vista «mis tareas»', async () => {
     server.use(http.get(`${API}/tasks`, () => HttpResponse.json({ data: [] })))
 
     renderWithSession(<AppRoutes />, { route: '/' })

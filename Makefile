@@ -13,8 +13,18 @@ SHELL := /bin/bash
 BACKEND  := backend
 FRONTEND := frontend
 
+# La matriz de trazabilidad es una herramienta general que vive en el repo
+# claude-config del autor (tools/matrix/). Se puede sobrescribir: make matriz CLAUDE_CONFIG=...
+CLAUDE_CONFIG ?= $(HOME)/projects/software/claude-config
+MATRIZ := node "$(CLAUDE_CONFIG)/tools/matrix"
+MATRIZ_DIR := docs/trazabilidad
+
+# El pre-push es la puerta de la matriz: si no está activo, que se vea.
+# `npm install` lo activa (script `prepare`); `make hooks` también.
+AVISO_HOOKS = [ "$$(git config core.hooksPath)" = .githooks ] || echo "AVISO: el hook pre-push no se ha activado, y nada impide un push con la matriz en rojo. Para activarlo: make hooks"
+
 .DEFAULT_GOAL := help
-.PHONY: help setup start install env migrate clean
+.PHONY: help setup start install env migrate hooks clean typecheck test matriz matriz-check matriz-viva
 
 # La ayuda se genera a partir de los comentarios `## ...` de cada target, para
 # que no haya un segundo listado que mantener a mano y que pueda divergir.
@@ -22,16 +32,22 @@ help: ## Muestra esta ayuda
 	@echo "FlowSync — targets disponibles:"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) \
-		| awk 'BEGIN { FS = ":.*## " }; { printf "  make %-8s %s\n", $$1, $$2 }'
+		| awk 'BEGIN { FS = ":.*## " }; { printf "  make %-13s %s\n", $$1, $$2 }'
 	@echo ""
 
 # ---------------------------------------------------------------------------
 # setup
 # ---------------------------------------------------------------------------
 
-setup: install env migrate ## Deja el proyecto listo para arrancar
+setup: install env migrate hooks ## Deja el proyecto listo para arrancar
 	@echo ""
 	@echo "✅ Setup completado. Arranca todo con: make start"
+
+# El hook pre-push bloquea el push si la matriz de trazabilidad no está en verde
+# (ver la sección «Traceability matrix» del README de claude-config).
+hooks:
+	@git config core.hooksPath .githooks
+	@echo "==> Hooks de git activados (.githooks/)."
 
 install:
 	@command -v node >/dev/null 2>&1 || { echo "❌ Node.js no está instalado."; exit 1; }
@@ -107,6 +123,46 @@ start: ## Levanta backend y frontend a la vez
 	( cd $(FRONTEND) && npm run dev; \
 	  echo ""; echo "⚠️  El frontend se ha parado. Cerrando el backend."; kill -INT 0 ) & \
 	wait
+
+# ---------------------------------------------------------------------------
+# tests y matriz de trazabilidad (claude-config/tools/matrix)
+# ---------------------------------------------------------------------------
+
+# Los runners de tests transpilan sin comprobar tipos: un error de tipos puede
+# esconderse detrás de una suite en verde. Comprueba los dos aunque uno falle.
+typecheck: ## Comprueba los tipos de backend y frontend
+	@fallo=0; \
+	echo "==> Typecheck del backend"; \
+	( cd $(BACKEND) && npx tsc --noEmit ) || fallo=1; \
+	echo "==> Typecheck del frontend"; \
+	( cd $(FRONTEND) && npx tsc -b ) || fallo=1; \
+	exit $$fallo
+
+# Corre backend y frontend aunque uno falle, para que la matriz tenga todos los
+# resultados, y sale con error si alguna ha fallado. Cada runner deja sus
+# resultados en su tmp/, que es de donde los lee la matriz.
+test: ## Ejecuta todos los tests y guarda sus resultados
+	@$(AVISO_HOOKS)
+	@set -o pipefail; fallo=0; \
+	mkdir -p $(BACKEND)/tmp $(FRONTEND)/tmp; \
+	$(MATRIZ)/matrix.ts --dir $(MATRIZ_DIR) --stamp; \
+	echo "==> Tests del backend"; \
+	( cd $(BACKEND) && npx c8 node ace test --reporters=spec --reporters=ndjson | tee tmp/resultados-tests.ndjson | grep -v '^{' ) || fallo=1; \
+	echo "==> Tests del frontend"; \
+	( cd $(FRONTEND) && npx vitest run --coverage --reporter=default --reporter=json --outputFile.json=tmp/resultados-tests.json ) || fallo=1; \
+	echo "==> Tests end-to-end"; \
+	( cd $(FRONTEND) && npx playwright test ) || fallo=1; \
+	exit $$fallo
+
+matriz: ## Regenera la matriz de trazabilidad con los últimos resultados
+	@$(AVISO_HOOKS)
+	@$(MATRIZ)/matrix.ts --dir $(MATRIZ_DIR)
+
+matriz-check: ## Falla si la matriz tiene huecos, rojos o está desfasada
+	@$(MATRIZ)/matrix.ts --dir $(MATRIZ_DIR) --check
+
+matriz-viva: ## Abre la matriz en el navegador y la repinta con cada ejecución
+	@$(MATRIZ)/server.ts --dir $(MATRIZ_DIR)
 
 # ---------------------------------------------------------------------------
 # clean

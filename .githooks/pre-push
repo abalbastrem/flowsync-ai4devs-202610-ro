@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Bloquea el push si hay errores de tipos o si la matriz de trazabilidad no está en verde: tests sin escenario,
+# escenarios sin test, en rojo u omitidos, o docs/trazabilidad/matrix.md desfasada.
+# Para saltártelo a conciencia: git push --no-verify
+set -e
+
+# La matriz la genera la herramienta de claude-config: sin ella, un mensaje claro
+# en lugar de un error de Node.
+CLAUDE_CONFIG="${CLAUDE_CONFIG:-$HOME/projects/software/claude-config}"
+if [ ! -f "$CLAUDE_CONFIG/tools/matrix/matrix.ts" ]; then
+  echo "ERROR: no encuentro la herramienta de la matriz en $CLAUDE_CONFIG/tools/matrix/." >&2
+  echo "  Clona https://github.com/abalbastrem/claude-config en esa ruta," >&2
+  echo "  o indica dónde está con: export CLAUDE_CONFIG=/ruta/a/claude-config" >&2
+  exit 1
+fi
+export CLAUDE_CONFIG
+
+make typecheck
+make test
+make matriz-check

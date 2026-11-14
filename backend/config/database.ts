@@ -1,5 +1,16 @@
 import app from '@adonisjs/core/services/app'
+import env from '#start/env'
 import { defineConfig } from '@adonisjs/lucid'
+
+/**
+ * A file of its own for the end-to-end tests (DB_FILE), so they never touch
+ * the development data.
+ */
+const separateFile = env.get('DB_FILE')
+if (separateFile && !/^[\w.-]+\.sqlite3$/.test(separateFile)) {
+  // A path here could point migration:fresh at data that is not the E2E's.
+  throw new Error(`DB_FILE must be a file name in tmp/ ending in .sqlite3, got: ${separateFile}`)
+}
 
 const dbConfig = defineConfig({
   /**
@@ -15,7 +26,7 @@ const dbConfig = defineConfig({
       client: 'better-sqlite3',
 
       connection: {
-        filename: app.tmpPath('db.sqlite3'),
+        filename: app.tmpPath(separateFile ?? 'db.sqlite3'),
       },
 
       /**

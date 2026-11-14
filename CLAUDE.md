@@ -36,7 +36,7 @@ node ace test --groups=... --tags=... --failed --watch
 node ace make:test --suite=functional # scaffolding de un fichero de test
 ```
 
-Ojo con la BD en tests: `config/database.ts` define una única conexión SQLite apuntando a `app.tmpPath('db.sqlite3')` sin override por entorno, así que las suites functional pegan contra el **mismo fichero** que el servidor de desarrollo. `.env.test` solo cambia `SESSION_DRIVER=memory`. Si añades tests que escriben, aísla con los hooks de `testUtils.db()` (truncate / transacción global) o el estado se filtra entre runs.
+Ojo con la BD en tests: `config/database.ts` define una única conexión SQLite en `app.tmpPath(DB_FILE ?? 'db.sqlite3')`. Solo los E2E fijan `DB_FILE` (`e2e.sqlite3`), así que las suites functional pegan contra el **mismo fichero** que el servidor de desarrollo. `.env.test` solo cambia `SESSION_DRIVER=memory`. Si añades tests que escriben, aísla con los hooks de `testUtils.db()` (truncate / transacción global) o el estado se filtra entre runs.
 
 Otros comandos útiles: `node ace list:routes`, `node ace make:controller|model|migration|validator|transformer|service`, `node ace migration:fresh`, `node ace repl`.
 
@@ -52,6 +52,21 @@ npm test          # vitest run
 ```
 
 Tests de componente con Vitest, Testing Library y MSW (la API se simula a nivel de red): ver [ADR 0001](docs/adr/0001-stack-de-tests-frontend.md).
+
+### Matriz de trazabilidad
+
+Cada escenario de OpenSpec lleva un ID `[SC-n]` único en todo el repo, y el título de cada test empieza por el ID del escenario que prueba. La matriz que los cruza es una herramienta general del repo `claude-config` del autor (`tools/matrix/`, ruta en `CLAUDE_CONFIG` del `Makefile`); aquí solo vive su configuración, `docs/trazabilidad/config.json`, y la matriz generada, `docs/trazabilidad/matrix.md`.
+
+```bash
+make test           # backend y frontend, con resultados y cobertura de ramas para la matriz
+make matriz         # regenera docs/trazabilidad/matrix.md
+make matriz-check   # falla si hay tests sin escenario, escenarios sin test, en rojo u omitidos
+make matriz-viva    # vista en http://localhost:5180 que se repinta sola con cada make test
+```
+
+El hook `.githooks/pre-push` es la puerta de la matriz: se activa solo con cualquier `npm install` (script `prepare` de `backend/` y `frontend/`), y también con `make setup` o `make hooks`. `make test` y `make matriz` avisan si no está activo. Corre `make typecheck`, `make test` (backend, frontend y E2E con Playwright) y `make matriz-check`, y bloquea el push si hay errores de tipos o la matriz no está en verde. Saltárselo (`git push --no-verify`) es una decisión consciente, nunca la salida por defecto.
+
+Los E2E (`frontend/e2e/`, `npm run test:e2e`) levantan su propio backend (puerto 3334, `DB_FILE=e2e.sqlite3`) y su propio Vite (5174): no tocan los datos de desarrollo.
 
 ## Arquitectura del backend
 

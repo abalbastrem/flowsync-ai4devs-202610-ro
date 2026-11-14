@@ -8,7 +8,7 @@ import { ANA, renderWithSession } from '@/test/render'
 import { aTask } from '@/test/tasks'
 
 describe('Crear una tarea con solo el título', () => {
-  it('el formulario de alta solo pide el título', async () => {
+  it('SC-18 · el formulario de alta solo pide el título', async () => {
     server.use(http.get(`${API}/tasks`, () => HttpResponse.json({ data: [] })))
 
     renderWithSession(<TasksPage />)
@@ -18,7 +18,7 @@ describe('Crear una tarea con solo el título', () => {
     expect(screen.getByLabelText('Título')).toBeInTheDocument()
   })
 
-  it('no ofrece responsable, estado ni fecha', async () => {
+  it('SC-18 · no ofrece responsable, estado ni fecha', async () => {
     server.use(http.get(`${API}/tasks`, () => HttpResponse.json({ data: [] })))
 
     renderWithSession(<TasksPage />)
@@ -30,7 +30,7 @@ describe('Crear una tarea con solo el título', () => {
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
   })
 
-  it('crear envía una petición que solo contiene el título', async () => {
+  it('SC-17 · crear envía una petición que solo contiene el título', async () => {
     let body: unknown
     server.use(
       http.get(`${API}/tasks`, () => HttpResponse.json({ data: [] })),
@@ -67,7 +67,7 @@ describe('Crear una tarea con solo el título', () => {
 })
 
 describe('La tarea creada se ve sin recargar', () => {
-  it('aparece la primera de la lista, a mi nombre y en «Pendiente», sin volver a pedir la lista', async () => {
+  it('SC-21 SC-22 · aparece la primera de la lista, a mi nombre y en «Pendiente», sin volver a pedir la lista', async () => {
     let listRequests = 0
     server.use(
       http.get(`${API}/tasks`, () => {

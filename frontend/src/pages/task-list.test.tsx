@@ -16,27 +16,8 @@ async function rows() {
   return within(list).getAllByRole('listitem')
 }
 
-describe('La lista es la misma para todos los miembros', () => {
-  it('pinta todas las tareas que devuelve la API, sin filtrar por usuario', async () => {
-    serveTasks([
-      aTask({ title: 'Tarea de Ana' }),
-      aTask({
-        title: 'Tarea de Bruno',
-        assignee: { id: 2, fullName: 'Bruno Díaz', initials: 'BD' },
-      }),
-    ])
-
-    renderWithSession(<TasksPage />)
-
-    const items = await rows()
-    expect(items).toHaveLength(2)
-    expect(screen.getByText('Tarea de Ana')).toBeInTheDocument()
-    expect(screen.getByText('Tarea de Bruno')).toBeInTheDocument()
-  })
-})
-
 describe('Cada fila muestra título, responsable y estado', () => {
-  it('muestra los tres datos, con el estado por su nombre', async () => {
+  it('SC-5 · muestra los tres datos, con el estado por su nombre', async () => {
     serveTasks([
       aTask({ title: 'Escribir el PRD', status: 'pending' }),
       aTask({
@@ -60,7 +41,7 @@ describe('Cada fila muestra título, responsable y estado', () => {
 })
 
 describe('El responsable se identifica por su nombre', () => {
-  it('con nombre se ve el nombre; sin nombre, las iniciales y nunca el email', async () => {
+  it('SC-7 SC-8 · con nombre se ve el nombre; sin nombre, las iniciales y nunca el email', async () => {
     serveTasks([
       aTask({ title: 'Con nombre' }),
       aTask({
@@ -79,7 +60,7 @@ describe('El responsable se identifica por su nombre', () => {
 })
 
 describe('Solo existen tres estados fijos', () => {
-  it('no hay forma de crear, renombrar ni eliminar estados', async () => {
+  it('SC-25 · no hay forma de crear, renombrar ni eliminar estados', async () => {
     serveTasks([
       aTask({ status: 'pending' }),
       aTask({ status: 'in_progress' }),
@@ -93,25 +74,10 @@ describe('Solo existen tres estados fijos', () => {
     expect(buttons).toEqual(['Crear tarea'])
     expect(screen.queryByText(/estado/i)).not.toBeInTheDocument()
   })
-
-  it('las filas solo usan las etiquetas «Pendiente», «En curso» y «Hecho»', async () => {
-    serveTasks([
-      aTask({ status: 'pending' }),
-      aTask({ status: 'in_progress' }),
-      aTask({ status: 'done' }),
-    ])
-
-    renderWithSession(<TasksPage />)
-
-    const labels = (await rows()).map(
-      (row) => row.lastElementChild?.textContent,
-    )
-    expect(labels).toEqual(['Pendiente', 'En curso', 'Hecho'])
-  })
 })
 
 describe('Las tareas más recientes van primero', () => {
-  it('las filas se pintan en el orden que devuelve la API', async () => {
+  it('SC-10 · las filas se pintan en el orden que devuelve la API', async () => {
     serveTasks([
       aTask({ title: 'C' }),
       aTask({ title: 'B' }),
@@ -128,7 +94,7 @@ describe('Las tareas más recientes van primero', () => {
 })
 
 describe('La lista no muestra fechas ni presencia', () => {
-  it('ninguna fila muestra una fecha ni una marca de vencida', async () => {
+  it('SC-11 · ninguna fila muestra una fecha ni una marca de vencida', async () => {
     serveTasks([aTask(), aTask({ status: 'done' })])
 
     renderWithSession(<TasksPage />)
@@ -138,7 +104,7 @@ describe('La lista no muestra fechas ni presencia', () => {
     }
   })
 
-  it('no hay señales de quién está en línea ni de actividad por persona', async () => {
+  it('SC-12 · no hay señales de quién está en línea ni de actividad por persona', async () => {
     serveTasks([aTask()])
 
     renderWithSession(<TasksPage />)
@@ -151,7 +117,7 @@ describe('La lista no muestra fechas ni presencia', () => {
 })
 
 describe('La lista vacía explica qué es y ofrece crear la primera tarea', () => {
-  it('sin tareas se ve un texto explicativo y el formulario, no una lista vacía', async () => {
+  it('SC-13 · sin tareas se ve un texto explicativo y el formulario, no una lista vacía', async () => {
     serveTasks([])
 
     renderWithSession(<TasksPage />)

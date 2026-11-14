@@ -24,7 +24,7 @@ const titles = (body: any) => (body.data as { title: string }[]).map((task) => t
 test.group('Lista: la misma para todos los miembros', (group) => {
   group.each.setup(() => testUtils.db().truncate())
 
-  test('dos personas distintas reciben exactamente el mismo conjunto de tareas', async ({
+  test('SC-1 · dos personas distintas reciben exactamente el mismo conjunto de tareas', async ({
     client,
     assert,
   }) => {
@@ -39,7 +39,7 @@ test.group('Lista: la misma para todos los miembros', (group) => {
     assert.lengthOf(asAna.body().data, 2)
   })
 
-  test('la tarea de la que otra persona es responsable aparece en mi lista', async ({
+  test('SC-2 · la tarea de la que otra persona es responsable aparece en mi lista', async ({
     client,
     assert,
   }) => {
@@ -50,12 +50,31 @@ test.group('Lista: la misma para todos los miembros', (group) => {
     response.assertStatus(200)
     assert.include(titles(response.body()), 'Tarea de Bruno')
   })
+
+  test('SC-3 · alguien recién registrado, sin tareas propias, recibe la lista entera como los demás', async ({
+    client,
+    assert,
+  }) => {
+    const { ana } = await seedTeam()
+    const carla = await User.create({
+      fullName: 'Carla Ruiz',
+      email: 'carla@example.com',
+      password: 'secret-password',
+    })
+
+    const asCarla = await client.visit('tasks.tasks.index').loginAs(carla)
+    const asAna = await client.visit('tasks.tasks.index').loginAs(ana)
+
+    asCarla.assertStatus(200)
+    assert.deepEqual(titles(asCarla.body()), titles(asAna.body()))
+    assert.lengthOf(asCarla.body().data, 2)
+  })
 })
 
 test.group('Lista: exige haber iniciado sesión', (group) => {
   group.each.setup(() => testUtils.db().truncate())
 
-  test('sin credenciales responde 401 y el cuerpo no contiene tareas', async ({
+  test('SC-14 · sin credenciales responde 401 y el cuerpo no contiene tareas', async ({
     client,
     assert,
   }) => {
@@ -71,7 +90,10 @@ test.group('Lista: exige haber iniciado sesión', (group) => {
 test.group('Lista: cada tarea trae título, responsable y estado', (group) => {
   group.each.setup(() => testUtils.db().truncate())
 
-  test('cada tarea del cuerpo incluye título, estado y responsable', async ({ client, assert }) => {
+  test('SC-6 · cada tarea del cuerpo incluye título, estado y responsable', async ({
+    client,
+    assert,
+  }) => {
     const { ana } = await seedTeam()
 
     const response = await client.visit('tasks.tasks.index').loginAs(ana)
@@ -88,7 +110,7 @@ test.group('Lista: cada tarea trae título, responsable y estado', (group) => {
 test.group('Lista: el responsable se identifica por su nombre', (group) => {
   group.each.setup(() => testUtils.db().truncate())
 
-  test('con un responsable sin nombre llegan sus iniciales, y nunca el email', async ({
+  test('SC-8 SC-9 · con un responsable sin nombre llegan sus iniciales, y nunca el email', async ({
     client,
     assert,
   }) => {
@@ -117,7 +139,10 @@ test.group('Lista: el responsable se identifica por su nombre', (group) => {
 test.group('Lista: las más recientes primero', (group) => {
   group.each.setup(() => testUtils.db().truncate())
 
-  test('las tareas creadas A, B y C se devuelven como C, B, A', async ({ client, assert }) => {
+  test('SC-10 · las tareas creadas A, B y C se devuelven como C, B, A', async ({
+    client,
+    assert,
+  }) => {
     const ana = await User.create({
       fullName: 'Ana García',
       email: 'ana@example.com',
@@ -140,7 +165,10 @@ test.group('Lista: las más recientes primero', (group) => {
 test.group('Lista: sin fechas', (group) => {
   group.each.setup(() => testUtils.db().truncate())
 
-  test('las tareas de la respuesta no incluyen campos de fecha', async ({ client, assert }) => {
+  test('SC-11 · las tareas de la respuesta no incluyen campos de fecha', async ({
+    client,
+    assert,
+  }) => {
     const { ana } = await seedTeam()
 
     const response = await client.visit('tasks.tasks.index').loginAs(ana)
@@ -156,7 +184,7 @@ test.group('Lista: sin fechas', (group) => {
 test.group('Lista: consultarla no modifica nada', (group) => {
   group.each.setup(() => testUtils.db().truncate())
 
-  test('varias consultas seguidas no cambian ninguna tarea', async ({ client, assert }) => {
+  test('SC-16 · varias consultas seguidas no cambian ninguna tarea', async ({ client, assert }) => {
     const { ana } = await seedTeam()
     await Task.create({ title: 'Hecha', assigneeId: ana.id, status: 'done' })
     const snapshot = async () => {
