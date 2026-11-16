@@ -175,7 +175,10 @@ describe('Una carga más antigua no hace desaparecer la tarea creada', () => {
         if (calls === 1) {
           // Esta respuesta se calculó antes del alta: no la contiene.
           await firstHeld
-          return HttpResponse.json({ data: [] })
+          return HttpResponse.json(
+            { data: [] },
+            { headers: { 'x-carga': 'antigua' } },
+          )
         }
         return HttpResponse.json({ data: [created] })
       }),
@@ -184,12 +187,24 @@ describe('Una carga más antigua no hace desaparecer la tarea creada', () => {
       ),
     )
 
+    // Crear mientras la lista carga dispara una carga nueva (la 2.ª), que ya
+    // trae la tarea. Lo que se prueba es que la 1.ª, que llega después y no la
+    // contiene, se descarta en vez de pisar la lista.
     renderWithSession(<TasksPage />)
     await typeAndCreate('Recién creada')
     await screen.findByText('Recién creada')
 
+    // Esperar a que MSW haya servido de verdad la respuesta antigua, no un
+    // tiempo fijo: si no, en un CI lento la aserción pasaría sin probar nada.
+    const staleServed = new Promise<void>((resolve) => {
+      server.events.on('response:mocked', ({ response }) => {
+        if (response.headers.get('x-carga') === 'antigua') resolve()
+      })
+    })
     releaseFirst()
-    // Dejar que la respuesta antigua llegue y se procese.
+    await staleServed
+    server.events.removeAllListeners('response:mocked')
+    // Y dar a la página el turno de procesarla.
     await new Promise((resolve) => setTimeout(resolve, 50))
 
     expect(screen.getByText('Recién creada')).toBeInTheDocument()
