@@ -40,6 +40,11 @@ Después de crear una tarea, quien la ha creado MUST verla en la lista sin recar
 - **WHEN** termino de crear una tarea
 - **THEN** la veo en la lista sin recargar ni navegar a ninguna otra parte
 
+#### Scenario: [SC-28] Una carga más antigua no la hace desaparecer
+- **GIVEN** que la lista todavía se está cargando
+- **WHEN** creo una tarea y la respuesta de esa carga llega después
+- **THEN** la tarea creada sigue en la lista
+
 ### Requirement: La tarea nace con quien la crea como responsable
 Una tarea recién creada MUST tener como responsable a la persona que la ha creado, sin que esta haya seleccionado a nadie.
 
@@ -67,3 +72,12 @@ Una tarea MUST estar siempre en exactamente uno de estos tres estados: «Pendien
 - **GIVEN** que estoy en cualquier punto del producto
 - **WHEN** busco la forma de añadir, renombrar o eliminar un estado
 - **THEN** no existe ninguna
+
+### Requirement: Si la creación falla, se explica y no se pierde lo escrito
+Cuando una tarea no se pueda crear, la pantalla MUST explicar en castellano que no se ha podido crear, sin errores técnicos crudos, y MUST conservar el título escrito para poder intentarlo de nuevo.
+
+#### Scenario: [SC-27] La creación falla
+- **GIVEN** que he iniciado sesión y he escrito un título
+- **WHEN** creo la tarea y el servidor falla
+- **THEN** veo un mensaje en castellano que explica que no se ha podido crear
+- **AND** el título sigue escrito en el campo y la lista no muestra ninguna tarea nueva
