@@ -130,7 +130,7 @@ async function request<T>(
     })
   } catch {
     throw new ApiError(
-      'No se pudo conectar con el servidor. Comprueba que el backend está arrancado.',
+      'No se pudo conectar con el servidor. Comprueba tu conexión e inténtalo de nuevo.',
       0,
     )
   }
