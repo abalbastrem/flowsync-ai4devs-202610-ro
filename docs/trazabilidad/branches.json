@@ -3,348 +3,406 @@
     "file": "backend/app/controllers/access_tokens_controller.ts",
     "code": "*",
     "class": "other-story",
-    "note": "Ningún test carga el módulo. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Ningún test carga el módulo. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "backend/app/controllers/new_account_controller.ts",
     "code": "*",
     "class": "other-story",
-    "note": "Ningún test carga el módulo. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Ningún test carga el módulo. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "backend/app/controllers/profile_controller.ts",
     "code": "*",
     "class": "other-story",
-    "note": "Ningún test carga el módulo. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Ningún test carga el módulo. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "backend/app/models/user.ts",
     "code": "return `${first.slice(0, 2)}`.toUpperCase()",
     "class": "dead-or-defensive",
-    "note": "Iniciales de un nombre de una palabra: con nombre la interfaz muestra el nombre, y sin nombre las iniciales salen del email, que siempre tiene dos partes. Se conserva."
+    "note": "Iniciales de un nombre de una palabra: con nombre la interfaz muestra el nombre, y sin nombre las iniciales salen del email, que siempre tiene dos partes. Se conserva.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "backend/app/transformers/user_transformer.ts",
     "code": "*",
     "class": "other-story",
-    "note": "Ningún test carga el módulo. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Ningún test carga el módulo. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "backend/app/validators/user.ts",
     "code": "*",
     "class": "other-story",
-    "note": "Ningún test carga el módulo. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Ningún test carga el módulo. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/auth/auth-provider.tsx",
     "code": "*",
     "class": "other-story",
-    "note": "Ningún test carga el módulo. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Ningún test carga el módulo. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/auth/use-auth-form.ts",
     "code": "if (error instanceof ApiError) {",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/auth/use-auth-form.ts",
     "code": "isShownInline && Object.keys(fieldErrors).length > 0",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/auth/use-auth-form.ts",
     "code": "? null",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/auth/use-auth-form.ts",
     "code": ": error.message,",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/auth/use-auth-form.ts",
     "code": "} else {",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/auth/use-auth.ts",
     "code": "if (!context) {",
     "class": "dead-or-defensive",
-    "note": "Error de programación (hook fuera del provider), no comportamiento de la persona. Se conserva."
+    "note": "Error de programación (hook fuera del provider), no comportamiento de la persona. Se conserva.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/components/field-error.tsx",
     "code": "if (!message) return null",
     "class": "dead-or-defensive",
-    "note": "Sin mensaje no pinta nada: guarda del componente de los formularios de cuenta. Se conserva."
+    "note": "Sin mensaje no pinta nada: guarda del componente de los formularios de cuenta. Se conserva.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": "const label = (field?: string) => FIELD_LABELS[field ?? ''] ?? 'el campo'",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": "case 'database.unique':",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": "? 'Ese email ya está registrado. Inicia sesión en su lugar.'",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": ": `Ya existe un registro con ${label(field)}.`",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": "case 'sameAs':",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": "case 'email':",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": "case 'required':",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": "case 'minLength':",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": "case 'maxLength':",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": "default:",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": "if (status === 401) {",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": "if (status === 400) {",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": "if (status === 422 && errors?.length) {",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": "if (error.field && !fieldErrors[error.field]) {",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/lib/api.ts",
     "code": "if (token) headers.Authorization = `Bearer ${token}`",
     "class": "other-story",
-    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Traducción de errores de validación y credenciales, y cabecera de token: formularios de cuenta. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/login-page.tsx",
     "code": "<Alert variant=\"destructive\">",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/login-page.tsx",
     "code": "aria-describedby={fieldErrors.email ? 'email-error' : undefined}",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/login-page.tsx",
     "code": "fieldErrors.password ? 'password-error' : undefined",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/login-page.tsx",
     "code": "{isSubmitting ? 'Entrando…' : 'Entrar'}",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/profile-page.tsx",
     "code": "if (!user) return null",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/profile-page.tsx",
     "code": "{user.fullName ?? 'Sin nombre'}",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/profile-page.tsx",
     "code": "{isLoggingOut ? 'Cerrando sesión…' : 'Cerrar sesión'}",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/register-page.tsx",
     "code": "if (password !== passwordConfirmation) {",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/register-page.tsx",
     "code": "fullName: fullName.trim() || null,",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/register-page.tsx",
     "code": "{formError && (",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/register-page.tsx",
     "code": "<Alert variant=\"destructive\">",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/register-page.tsx",
     "code": "fieldErrors.fullName ? 'fullName-error' : undefined",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/register-page.tsx",
     "code": "aria-describedby={fieldErrors.email ? 'email-error' : undefined}",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/register-page.tsx",
     "code": "fieldErrors.password ? 'password-error' : 'password-hint'",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/register-page.tsx",
     "code": "<FieldError id=\"password-error\" message={fieldErrors.password} />",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/register-page.tsx",
     "code": "<p id=\"password-hint\" className=\"text-muted-foreground text-sm\">",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/register-page.tsx",
     "code": "? 'passwordConfirmation-error'",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/register-page.tsx",
     "code": ": undefined",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/register-page.tsx",
     "code": "{isSubmitting ? 'Creando cuenta…' : 'Crear cuenta'}",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/tasks-page.tsx",
     "code": "if (caught instanceof ApiError && caught.status === 401) {",
     "class": "other-story",
-    "note": "Sesión caducada (401) a mitad de uso: RF-4. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Sesión caducada (401) a mitad de uso: RF-4. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/tasks-page.tsx",
     "code": "if (!token) return",
     "class": "dead-or-defensive",
-    "note": "ProtectedRoute ya garantiza que hay token: no se llega sin él. Se conserva."
+    "note": "ProtectedRoute ya garantiza que hay token: no se llega sin él. Se conserva.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/tasks-page.tsx",
     "code": "if (id !== latestLoad.current || isExpiredSession(caught)) return",
     "class": "other-story",
-    "note": "Sesión caducada (401) a mitad de uso: RF-4. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Sesión caducada (401) a mitad de uso: RF-4. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/tasks-page.tsx",
     "code": "setTasks((current) => [created, ...(current ?? [])])",
     "class": "dead-or-defensive",
-    "note": "En esta rama la lista ya está cargada: nunca es null. Se conserva."
+    "note": "En esta rama la lista ya está cargada: nunca es null. Se conserva.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/tasks-page.tsx",
     "code": "if (isExpiredSession(caught)) return",
     "class": "other-story",
-    "note": "Sesión caducada (401) a mitad de uso: RF-4. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "Sesión caducada (401) a mitad de uso: RF-4. E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/routes/protected-route.tsx",
     "code": "if (status === 'loading') return <FullScreenLoader />",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/routes/public-only-route.tsx",
     "code": "if (status === 'loading') return <FullScreenLoader />",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/routes/public-only-route.tsx",
     "code": "if (status === 'authenticated') return <Navigate to=\"/\" replace />",
     "class": "other-story",
-    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado."
+    "note": "E1 «Cuentas y acceso»: sin spec en OpenSpec; el propietario la ha aplazado.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/tasks-page.tsx",
     "code": ": 'No se ha podido cargar la lista.',",
     "class": "dead-or-defensive",
-    "note": "Solo se llega si el error no es un ApiError, y api.ts convierte todos, también los de red: red de seguridad para que nunca se vea un error crudo. Se conserva."
+    "note": "Solo se llega si el error no es un ApiError, y api.ts convierte todos, también los de red: red de seguridad para que nunca se vea un error crudo. Se conserva.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
     "file": "frontend/src/pages/tasks-page.tsx",
     "code": ": 'No se ha podido crear la tarea.',",
     "class": "dead-or-defensive",
-    "note": "Solo se llega si el error no es un ApiError, y api.ts convierte todos, también los de red: red de seguridad para que nunca se vea un error crudo. Se conserva."
+    "note": "Solo se llega si el error no es un ApiError, y api.ts convierte todos, también los de red: red de seguridad para que nunca se vea un error crudo. Se conserva.",
+    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   }
 ]
