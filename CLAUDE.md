@@ -68,6 +68,10 @@ El hook `.githooks/pre-push` es la puerta de la matriz: se activa solo con cualq
 
 Los E2E (`frontend/e2e/`, `npm run test:e2e`) levantan su propio backend (puerto 3334, `DB_FILE=e2e.sqlite3`) y su propio Vite (5174): no tocan los datos de desarrollo.
 
+## Ficheros generados
+
+La lista única del proyecto (regla general en el `CLAUDE.md` global, «Fitxers generats»): `backend/database/schema.ts`, `backend/.adonisjs/` y `frontend/src/components/ui/`. Están bloqueados con `deny` de `Edit` y `Write` en `.claude/settings.json` y fuera de la cobertura (`backend/.c8rc.json`, `frontend/vitest.config.ts`). Cómo se regenera cada uno está más abajo.
+
 ## Arquitectura del backend
 
 ### El esquema se genera, no se escribe

@@ -1,4 +1,14 @@
 {
+  "permissions": {
+    "deny": [
+      "Edit(/backend/database/schema.ts)",
+      "Write(/backend/database/schema.ts)",
+      "Edit(/backend/.adonisjs/**)",
+      "Write(/backend/.adonisjs/**)",
+      "Edit(/frontend/src/components/ui/**)",
+      "Write(/frontend/src/components/ui/**)"
+    ]
+  },
   "hooks": {
     "PostToolUse": [
       {
