@@ -42,13 +42,6 @@
     "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/33#issuecomment-6947979746"
   },
   {
-    "file": "backend/start/routes.ts",
-    "code": "if (app.inDev) {",
-    "class": "technical-decision",
-    "note": "Herramienta de documentación solo para desarrollo, no es funcionalidad del producto: las rutas OpenAPI solo se registran con app.inDev. Sin test por decisión del propietario. Verificado a mano: 200 en development, 404 en production.",
-    "ref": "https://github.com/abalbastrem/flowsync-ai4devs-202610-ro/pull/37#issuecomment-7086048091"
-  },
-  {
     "file": "frontend/src/auth/auth-provider.tsx",
     "code": "*",
     "class": "other-story",

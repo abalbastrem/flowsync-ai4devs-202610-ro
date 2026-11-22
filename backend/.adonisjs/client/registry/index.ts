@@ -6,24 +6,6 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
-  'openapi.html': {
-    methods: ["GET","HEAD"],
-    pattern: '/api',
-    tokens: [{"old":"/api","type":0,"val":"api","end":""}],
-    types: placeholder as Registry['openapi.html']['types'],
-  },
-  'openapi.json': {
-    methods: ["GET","HEAD"],
-    pattern: '/api.json',
-    tokens: [{"old":"/api.json","type":0,"val":"api.json","end":""}],
-    types: placeholder as Registry['openapi.json']['types'],
-  },
-  'openapi.yaml': {
-    methods: ["GET","HEAD"],
-    pattern: '/api.yaml',
-    tokens: [{"old":"/api.yaml","type":0,"val":"api.yaml","end":""}],
-    types: placeholder as Registry['openapi.yaml']['types'],
-  },
   'auth.new_account.store': {
     methods: ["POST"],
     pattern: '/api/v1/auth/signup',
@@ -59,6 +41,24 @@ const routes = {
     pattern: '/api/v1/tasks',
     tokens: [{"old":"/api/v1/tasks","type":0,"val":"api","end":""},{"old":"/api/v1/tasks","type":0,"val":"v1","end":""},{"old":"/api/v1/tasks","type":0,"val":"tasks","end":""}],
     types: placeholder as Registry['tasks.tasks.store']['types'],
+  },
+  'openapi.html': {
+    methods: ["GET","HEAD"],
+    pattern: '/api',
+    tokens: [{"old":"/api","type":0,"val":"api","end":""}],
+    types: placeholder as Registry['openapi.html']['types'],
+  },
+  'openapi.json': {
+    methods: ["GET","HEAD"],
+    pattern: '/api.json',
+    tokens: [{"old":"/api.json","type":0,"val":"api.json","end":""}],
+    types: placeholder as Registry['openapi.json']['types'],
+  },
+  'openapi.yaml': {
+    methods: ["GET","HEAD"],
+    pattern: '/api.yaml',
+    tokens: [{"old":"/api.yaml","type":0,"val":"api.yaml","end":""}],
+    types: placeholder as Registry['openapi.yaml']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 
