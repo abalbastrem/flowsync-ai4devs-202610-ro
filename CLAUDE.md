@@ -114,6 +114,14 @@ Rutas actuales (`start/routes.ts`), todas bajo `/api/v1`:
 | POST | `/api/v1/auth/login` | `AccessTokensController.store` | no |
 | GET | `/api/v1/account/profile` | `ProfileController.show` | sí |
 | POST | `/api/v1/account/logout` | `AccessTokensController.destroy` | sí |
+| GET | `/api/v1/tasks` | `TasksController.index` | sí |
+| POST | `/api/v1/tasks` | `TasksController.store` | sí |
+
+### Documento OpenAPI (solo en desarrollo)
+
+`@foadonis/openapi` (provider en `adonisrc.ts`, configuración en `config/openapi.ts`) genera el documento a partir de las rutas. `start/routes.ts` lo registra **solo si `app.inDev`**, sin auth: `GET /api` (UI de Scalar, cargada desde CDN), `GET /api.json` y `GET /api.yaml`. En `test` y `production` estas rutas no existen.
+
+El documento está **incompleto y no es fiable**: sin decoradores en los controladores, las operaciones salen sin cuerpo de petición, sin respuestas y con `security: []`, que afirma que no requieren auth aunque la requieran. Sirve para ver las rutas, no como contrato. Usar OpenAPI como contrato está aplazado: [claude-config#31](https://github.com/abalbastrem/claude-config/issues/31).
 
 ### Validación
 

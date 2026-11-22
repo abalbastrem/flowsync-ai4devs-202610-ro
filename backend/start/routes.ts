@@ -11,8 +11,15 @@ import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
 import openapi from '@foadonis/openapi/services/main'
+import app from '@adonisjs/core/services/app'
 
-openapi.registerRoutes()
+/**
+ * The OpenAPI document and its UI exist only in development: they expose the
+ * whole route map, and the Scalar UI loads third-party code from a CDN.
+ */
+if (app.inDev) {
+  openapi.registerRoutes()
+}
 
 router.get('/', () => {
   return { hello: 'world' }
