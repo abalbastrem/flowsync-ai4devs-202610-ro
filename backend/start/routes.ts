@@ -10,6 +10,9 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
+import openapi from '@foadonis/openapi/services/main'
+
+openapi.registerRoutes()
 
 router.get('/', () => {
   return { hello: 'world' }
