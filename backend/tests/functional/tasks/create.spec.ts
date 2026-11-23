@@ -32,6 +32,36 @@ test.group('Tareas: crear con solo el título', (group) => {
     response.assertStatus(401)
     assert.lengthOf(await Task.all(), 0)
   })
+
+  test('SC-29 · ignora el responsable y el estado enviados junto al título', async ({
+    client,
+    assert,
+  }) => {
+    const ana = await User.create({
+      fullName: 'Ana García',
+      email: 'ana@example.com',
+      password: 'secret-password',
+    })
+    const luis = await User.create({
+      fullName: 'Luis Pérez',
+      email: 'luis@example.com',
+      password: 'secret-password',
+    })
+
+    const created = await client
+      .visit('tasks.tasks.store')
+      .json({ title: 'Con campos de más', assigneeId: luis.id, status: 'done' } as {
+        title: string
+      })
+      .loginAs(ana)
+    const listed = await client.visit('tasks.tasks.index').loginAs(ana)
+
+    created.assertStatus(201)
+    assert.equal(created.body().data.assignee.id, ana.id)
+    assert.equal(created.body().data.status, 'pending')
+    assert.equal(listed.body().data[0].assignee.id, ana.id)
+    assert.equal(listed.body().data[0].status, 'pending')
+  })
 })
 
 test.group('Tareas: nacen mías y en «Pendiente»', (group) => {
