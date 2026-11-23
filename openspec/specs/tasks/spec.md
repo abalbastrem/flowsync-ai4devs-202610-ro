@@ -30,6 +30,7 @@ Una persona con sesión MUST poder crear una tarea indicando únicamente su tít
 - **GIVEN** que no envío credenciales válidas
 - **WHEN** envío por la API una petición de creación
 - **THEN** la respuesta es 401
+- **AND** no se crea ninguna tarea
 
 #### Scenario: [SC-29] La API ignora los campos que no son el título
 - **GIVEN** que tengo sesión iniciada
