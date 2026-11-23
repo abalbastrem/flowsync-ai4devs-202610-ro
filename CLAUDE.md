@@ -114,6 +114,21 @@ Rutas actuales (`start/routes.ts`), todas bajo `/api/v1`:
 | POST | `/api/v1/auth/login` | `AccessTokensController.store` | no |
 | GET | `/api/v1/account/profile` | `ProfileController.show` | sí |
 | POST | `/api/v1/account/logout` | `AccessTokensController.destroy` | sí |
+| GET | `/api/v1/tasks` | `TasksController.index` | sí |
+| POST | `/api/v1/tasks` | `TasksController.store` | sí |
+
+### Documento OpenAPI (solo en desarrollo)
+
+`@foadonis/openapi` (provider en `adonisrc.ts`, configuración en `config/openapi.ts`) genera el documento a partir de las rutas. `start/openapi.ts` (preload) lo registra **solo si `app.inDev`**, sin auth: `GET /api` (UI de Scalar, cargada desde CDN), `GET /api.json` y `GET /api.yaml`. En `test` y `production` estas rutas no existen. `app.inDev` solo mira `NODE_ENV`, y `.env.example` trae `development`: **en producción hay que fijar `NODE_ENV=production`**, o el documento queda expuesto.
+
+El documento está **incompleto y no es fiable**: sin decoradores en los controladores, las operaciones salen sin cuerpo de petición, sin respuestas y con `security: []`, que afirma que no requieren auth aunque la requieran. Sirve para ver las rutas, no como contrato. Usar OpenAPI como contrato está aplazado: [claude-config#31](https://github.com/abalbastrem/claude-config/issues/31).
+
+### Código de metaproyecto
+
+Su definición y sus reglas están en la sección «Codi de metaprojecte» del `CLAUDE.md` global ([ADR 0003 de claude-config](https://github.com/abalbastrem/claude-config/blob/main/docs/adr/0003-codi-de-metaprojecte.md)). Aquí solo vive la lista de este proyecto:
+
+- `backend/start/openapi.ts`: excluido en `backend/.c8rc.json`. No está en el `deny`, porque se edita a mano.
+- `backend/config/openapi.ts`: c8 solo mide `app/` y `start/`, así que ya queda fuera.
 
 ### Validación
 

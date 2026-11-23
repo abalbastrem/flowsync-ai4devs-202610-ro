@@ -53,6 +53,7 @@ export default defineConfig({
     () => import('@adonisjs/cors/cors_provider'),
     () => import('@adonisjs/auth/auth_provider'),
     () => import('#providers/api_provider'),
+    () => import('@foadonis/openapi/openapi_provider'),
   ],
 
   /*
@@ -67,6 +68,7 @@ export default defineConfig({
     () => import('#start/routes'),
     () => import('#start/kernel'),
     () => import('#start/validator'),
+    () => import('#start/openapi'),
   ],
 
   /*

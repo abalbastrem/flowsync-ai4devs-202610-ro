@@ -2,7 +2,7 @@
   "all": true,
   "src": ["app", "start"],
   "include": ["app/**/*.ts", "start/**/*.ts"],
-  "exclude": ["database/schema.ts", ".adonisjs/**", "tests/**"],
+  "exclude": ["database/schema.ts", ".adonisjs/**", "tests/**", "start/openapi.ts"],
   "reporter": ["json", "json-summary", "text-summary"],
   "reports-dir": "coverage",
   "temp-directory": "coverage/.tmp"

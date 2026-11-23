@@ -24,4 +24,9 @@ export interface ApiDefinition {
       store: typeof routes['tasks.tasks.store']
     }
   }
+  openapi: {
+    html: typeof routes['openapi.html']
+    json: typeof routes['openapi.json']
+    yaml: typeof routes['openapi.yaml']
+  }
 }

@@ -10,14 +10,23 @@ export type ScannedRoutes = {
     'profile.access_tokens.destroy': { paramsTuple?: []; params?: {} }
     'tasks.tasks.index': { paramsTuple?: []; params?: {} }
     'tasks.tasks.store': { paramsTuple?: []; params?: {} }
+    'openapi.html': { paramsTuple?: []; params?: {} }
+    'openapi.json': { paramsTuple?: []; params?: {} }
+    'openapi.yaml': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'profile.profile.show': { paramsTuple?: []; params?: {} }
     'tasks.tasks.index': { paramsTuple?: []; params?: {} }
+    'openapi.html': { paramsTuple?: []; params?: {} }
+    'openapi.json': { paramsTuple?: []; params?: {} }
+    'openapi.yaml': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'profile.profile.show': { paramsTuple?: []; params?: {} }
     'tasks.tasks.index': { paramsTuple?: []; params?: {} }
+    'openapi.html': { paramsTuple?: []; params?: {} }
+    'openapi.json': { paramsTuple?: []; params?: {} }
+    'openapi.yaml': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'auth.new_account.store': { paramsTuple?: []; params?: {} }
