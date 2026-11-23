@@ -32,6 +32,12 @@ Una persona con sesión MUST poder crear una tarea indicando únicamente su tít
 - **THEN** la respuesta es 401
 - **AND** no se crea ninguna tarea
 
+#### Scenario: [SC-29] La API ignora los campos que no son el título
+- **GIVEN** que tengo sesión iniciada
+- **WHEN** envío por la API una petición de creación con un título y además un responsable y un estado
+- **THEN** la respuesta es 201
+- **AND** la tarea creada tiene como responsable a quien la creó y está en «Pendiente», sin tener en cuenta los campos enviados
+
 ### Requirement: La tarea creada se ve sin recargar
 Después de crear una tarea, quien la ha creado MUST verla en la lista sin recargar la página ni navegar a otra parte.
 
