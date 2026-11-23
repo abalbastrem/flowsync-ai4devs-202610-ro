@@ -48,6 +48,8 @@ test.group('Tareas: crear con solo el título', (group) => {
       password: 'secret-password',
     })
 
+    // El payload tipado de la ruta solo admite `title`: el cast deja enviar a
+    // propósito los campos que la API tiene que ignorar.
     const created = await client
       .visit('tasks.tasks.store')
       .json({ title: 'Con campos de más', assigneeId: luis.id, status: 'done' } as {
