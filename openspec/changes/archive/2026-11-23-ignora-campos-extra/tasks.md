@@ -9,5 +9,5 @@
 
 ## 2. Cierre
 
-- [ ] 2.1 E2E: no hay pantalla nueva; ninguno.
-- [ ] 2.2 Auditoría de cobertura: sin ramas nuevas (no hay código nuevo), y `make matriz-check` en verde con 29 escenarios.
+- [x] 2.1 E2E: no hay pantalla nueva; ninguno.
+- [x] 2.2 Auditoría de cobertura: sin ramas nuevas (no hay código nuevo), y `make matriz-check` en verde con 29 escenarios.
