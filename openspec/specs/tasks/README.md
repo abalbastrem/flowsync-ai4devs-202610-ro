@@ -47,7 +47,7 @@ La matriz [`docs/trazabilidad/matrix.md`](../../../docs/trazabilidad/matrix.md) 
 
 ## Qué falta
 
-- **Reglas del título:** [E2-2](../../../docs/backlog/E2-gestion-tareas/us-titulo-obligatorio.md). Hoy un título vacío o solo de espacios ya se rechaza, pero con un error técnico en inglés y sin ningún escenario que lo fije. La longitud no tiene límite.
+- **Reglas del título:** [E2-2](../../../docs/backlog/E2-gestion-tareas/us-titulo-obligatorio.md). Hoy un título vacío o solo de espacios ya se rechaza (la pantalla dice «Falta rellenar el campo.»), pero ningún escenario lo fija. La longitud no tiene límite.
 - **Cambiar el estado:** [E2-4](../../../docs/backlog/E2-gestion-tareas/us-cambiar-estado.md). Los tres estados existen, pero toda tarea se queda en «Pendiente».
 - **Abrir, editar el título, reasignar y borrar:** [E2-5](../../../docs/backlog/E2-gestion-tareas/us-abrir-tarea.md), [E2-6](../../../docs/backlog/E2-gestion-tareas/us-editar-titulo.md), [E2-7](../../../docs/backlog/E2-gestion-tareas/us-reasignar-responsable.md) y [E2-10](../../../docs/backlog/E2-gestion-tareas/us-borrar-tarea.md).
 - **Fecha de vencimiento:** [FS-118](../../../docs/backlog/E2-gestion-tareas/us-fechas-vencimiento.md).
